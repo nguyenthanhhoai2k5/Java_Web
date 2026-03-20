@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
+<section>
+  <div class="container mt-4" style="max-width: 80%;">
+    <a th:href="@{/admin/users}" class="btn btn-outline-secondary btn-sm mb-3">
+      <i class="bi bi-arrow-left"></i> Trở về
+    </a>
+
+    <h1 class="mb-4">Lịch sử mua hàng của: <span class="text-primary" th:text="${user.fullName}"></span></h1>
+
+    <div class="card p-3 mb-4 shadow-sm">
+      <form th:action="@{'/admin/users/history/' + ${user.id}}" method="get" class="row g-3">
+        <div class="col-md-4">
+          <input type="text" name="keyword" class="form-control" placeholder="Tên sản phẩm..." th:value="${keyword}">
+        </div>
+        <div class="col-md-3">
+          <input type="date" name="startDate" class="form-control" th:value="${startDate}">
+        </div>
+        <div class="col-md-3">
+          <input type="date" name="endDate" class="form-control" th:value="${endDate}">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">Lọc</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card shadow border-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th>STT</th>
+            <th>Mã đơn</th>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá mua</th>
+            <th>Ngày mua</th>
+            <th>Trạng thái</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:if="${#lists.isEmpty(history)}">
+            <td colspan="7" class="text-center py-5 text-muted fw-bold">Không có lịch sử mua hàng</td>
+          </tr>
+          <tr th:each="detail, state : ${history}">
+            <td th:text="${state.count}"></td>
+            <td th:text="${'#ORD-' + detail.order.id}"></td>
+            <td>
+              <div class="d-flex align-items-center">
+                <img th:src="@{'/images/' + ${detail.product.image}}"
+                     style="width: 100px; height: 70px; object-fit: cover;" class="rounded me-3 border">
+                <div>
+                  <div class="fw-bold" th:text="${detail.product.name}"></div>
+                  <small class="text-muted" th:text="${detail.product.category.name}"></small>
+                </div>
+              </div>
+            </td>
+            <td th:text="${detail.quantity}"></td>
+            <td th:text="${#numbers.formatDecimal(detail.priceAtPurchase, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></td>
+            <td th:text="${detail.order.orderDate}"></td>
+            <td>
+                                <span th:classappend="${detail.order.status == 'Đã giao' ? 'badge bg-success' :
+                                                  (detail.order.status == 'Đã hủy' ? 'badge bg-danger' : 'badge bg-warning text-dark')}"
+                                      th:text="${detail.order.status}"></span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+</html>

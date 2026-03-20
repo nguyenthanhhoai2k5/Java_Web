@@ -1,15 +1,12 @@
 package com.example.fashionstore.controller;
 
-import com.example.fashionstore.model.Category;
-import com.example.fashionstore.model.Coupon;
-import com.example.fashionstore.model.Product;
+import com.example.fashionstore.model.*;
 import com.example.fashionstore.repository.CategoryRepository;
 import com.example.fashionstore.repository.CouponRepository;
-import com.example.fashionstore.service.CategoryService;
-import com.example.fashionstore.service.CouponService;
-import com.example.fashionstore.service.ProductService;
+import com.example.fashionstore.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +41,12 @@ public class AdminController {
 
     @Autowired
     private CouponService couponService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    OrderService orderService;
 
     // Home
     @GetMapping({"/", "/home"})
@@ -128,18 +132,6 @@ public class AdminController {
         model.addAttribute("page", "category");
         return "admin_category";
     }
-    //  Controller nút thm sản phẩm .
-    @GetMapping("/product/add")
-    public String addProductPage(Model model) {
-        // 1. Phải gửi một đối tượng Product trống để Thymeleaf liên kết (bind) dữ liệu form
-        model.addAttribute("product", new Product());
-
-        // 2. Gửi danh sách categories để đổ vào Selectbox
-        model.addAttribute("categories", categoryService.getAll());
-
-        model.addAttribute("page", "category");
-        return "admin_product_add";
-    }
 
     // Lưu sản phẩm va database:
     @PostMapping("/product/save")
@@ -162,6 +154,18 @@ public class AdminController {
             ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/category";
+    }
+    //  Mở trang thêm sản phẩm
+    @GetMapping("/product/add")
+    public String addProductPage(Model model) {
+        // 1. Phải gửi một đối tượng Product trống để Thymeleaf liên kết (bind) dữ liệu form
+        model.addAttribute("product", new Product());
+
+        // 2. Gửi danh sách categories để đổ vào Selectbox
+        model.addAttribute("categories", categoryService.getAll());
+
+        model.addAttribute("page", "category");
+        return "admin_product_add";
     }
 
     // 1. Mở trang chỉnh sửa sản phẩm
@@ -240,6 +244,71 @@ public class AdminController {
             ra.addFlashAttribute("error", "Không thể xóa mã giảm giá này: " + e.getMessage());
         }
         return "redirect:/admin/coupons";
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // LẤY THÔNG TIN NGƯƠI DÙNG
+    //----------------------------------------------------------------------------------------
+    @GetMapping("/users")   // Cho phép điều hướng trang user
+    public String manageUsers(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
+        List<User> users;
+        if (keyword != null && !keyword.isEmpty()) {
+            users = userService.searchByName(keyword);
+            model.addAttribute("keyword", keyword);
+        } else {
+            users = userService.getAllUsers();
+        }
+
+        model.addAttribute("users", users);
+        model.addAttribute("page", "users");
+        return "admin_user_list";
+    }
+    //  Hàm cho phép admin có thẻ phân quền trực tiếp
+    @PostMapping("/users/update-role")
+    @ResponseBody // Trả về text/json thay vì chuyển hướng trang
+    public String updateRole(@RequestParam("id") Long id, @RequestParam("role") String role) {
+        try {
+            User user = userService.getById(id);
+            if (user != null) {
+                user.setRole(role);
+                userService.save(user); // Cập nhật vào DB
+                return "Success";
+            }
+        } catch (Exception e) {
+            return "Error";
+        }
+        return "Fail";
+    }
+
+    // Xem lịch sử của người dùng
+    @GetMapping("/users/history/{id}")
+    public String viewUserHistory(@PathVariable("id") Long id,
+                                  @RequestParam(value = "keyword", required = false) String keyword,
+                                  @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                  @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                  Model model) {
+        User user = userService.getById(id);
+        // Logic: Tìm kiếm chi tiết đơn hàng của User này
+        // Ở đây tôi giả định bạn viết hàm findHistory trong OrderService
+        List<OrderDetail> history = orderService.findHistory(id, keyword, startDate, endDate);
+
+        model.addAttribute("user", user);
+        model.addAttribute("history", history);
+        model.addAttribute("page", "users");
+        return "admin_user_history";
+    }
+    // XÓA TÀI KHOẢN
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable("id") Long id, RedirectAttributes ra) {
+        try {
+            userService.softDelete(id);
+            ra.addFlashAttribute("message", "Đã xóa tài khoản thành công!");
+        } catch (Exception e) {
+            // Nếu lỗi xảy ra (thường do còn đơn hàng liên quan), báo lỗi cho Admin
+            ra.addFlashAttribute("error", "Không thể xóa tài khoản này vì đã có dữ liệu mua hàng liên quan!");
+            e.printStackTrace();
+        }
+        return "redirect:/admin/users";
     }
 
 
