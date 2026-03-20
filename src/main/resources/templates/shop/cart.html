@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng</title>
+</head>
+<body>
+<header>
+    <h1>Giỏ hàng của bạn</h1>
+    <p><a th:href="@{/shop/products}">Tiếp tục mua hàng</a></p>
+</header>
+
+<hr>
+
+<section th:if="${message}">
+    <p style="color: green;" th:text="${message}">Thông báo</p>
+</section>
+
+<section th:if="${#lists.isEmpty(cartItems)}">
+    <p>Giỏ hàng hiện đang trống.</p>
+</section>
+
+<section th:if="${!#lists.isEmpty(cartItems)}">
+    <table border="1" cellpadding="10">
+        <thead>
+        <tr>
+            <th>Mã SP</th>
+            <th>Tên sản phẩm</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+            <th>Tạm tính</th>
+            <th>Chức năng</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${cartItems}">
+            <td th:text="${item.productId}">1</td>
+            <td th:text="${item.productName}">Tên sản phẩm</td>
+            <td th:text="${T(java.lang.Math).round(item.price) + ' VND'}">0 VND</td>
+            <td>
+                <form th:action="@{/shop/cart/update}" method="post">
+                    <input type="hidden" name="productId" th:value="${item.productId}">
+                    <label th:for="${'cart-quantity-' + item.productId}">Số lượng</label>
+                    <input th:id="${'cart-quantity-' + item.productId}"
+                           type="number"
+                           name="quantity"
+                           th:value="${item.quantity}"
+                           min="1">
+                    <button type="submit">Cập nhật</button>
+                </form>
+            </td>
+            <td th:text="${T(java.lang.Math).round(item.subtotal) + ' VND'}">0 VND</td>
+            <td>
+                <form th:action="@{/shop/cart/remove}" method="post">
+                    <input type="hidden" name="productId" th:value="${item.productId}">
+                    <button type="submit">Xóa</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>Tổng số lượng: <strong th:text="${totalItems}">0</strong></p>
+    <p>Tổng tiền: <strong th:text="${T(java.lang.Math).round(totalAmount) + ' VND'}">0 VND</strong></p>
+</section>
+</body>
+</html>
