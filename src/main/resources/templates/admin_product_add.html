@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
+<section>
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="container mt-4" style="max-width: 80%;">
+        <div class="mb-3">
+            <a th:href="@{/admin/category}" class="btn btn-outline-secondary btn-sm">
+                Quay về danh sách sản phẩm
+            </a>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h1 class="h3 mb-0 text-primary"
+                    th:text="${product.id != null ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'}"></h1>
+            </div>
+
+            <div class="card-body">
+                <form th:action="@{/admin/product/save}"
+                      th:object="${product}"
+                      method="post"
+                      enctype="multipart/form-data">
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" th:field="*{image}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tên sản phẩm</label>
+                            <input type="text" th:field="*{name}" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Loại sản phẩm</label>
+                            <select th:field="*{category.id}" class="form-select" required>
+                                <option value="">Chọn loại sản phẩm</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Giá sản phẩm</label>
+                            <input type="number" th:field="*{price}" class="form-control" min="0" step="0.01" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Số lượng</label>
+                            <input type="number" th:field="*{quantity}" class="form-control" min="0" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Trạng thái</label>
+                            <select th:field="*{status}" class="form-select" required>
+                                <option value="Mới">Mới</option>
+                                <option value="Cũ">Cũ</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Hình ảnh</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                            <div class="mt-2" th:if="${product.image != null and !#strings.isEmpty(product.image)}">
+                                <img th:src="@{'/images/' + ${product.image}}"
+                                     alt="Ảnh sản phẩm"
+                                     class="img-thumbnail"
+                                     style="max-height: 180px;">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Mô tả</label>
+                            <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success px-5">Lưu sản phẩm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</html>

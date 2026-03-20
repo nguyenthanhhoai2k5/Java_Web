@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
+<section>
+    <div class="container mt-4" style="max-width: 80%;">
+        <div class="mb-3">
+            <a th:href="@{/admin/coupons}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> ← Trở về danh sách
+            </a>
+        </div>
+
+        <div class="card shadow border-0">
+            <div class="card-header bg-white py-3">
+                <h1 class="h3 mb-0 text-primary"
+                    th:text="${coupon.id != null ? 'Sửa mã giảm giá' : 'Thêm mã giảm giá'}"></h1>
+            </div>
+
+            <div class="card-body p-4">
+                <form th:action="@{/admin/coupons/save}" th:object="${coupon}" method="post">
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã giảm giá</label>
+                                <input type="text" th:field="*{code}" class="form-control"
+                                       placeholder="VD: KHUYENMAI2026" required>
+                                <small class="text-muted" th:if="${coupon.id == null}">Hệ thống sẽ tự tạo nếu bạn để trống.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên chương trình / Mô tả ngắn</label>
+                                <input type="text" th:field="*{description}" class="form-control"
+                                       placeholder="Nhập tên chương trình..." required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Loại sản phẩm áp dụng</label>
+                                <select name="categoryIds" class="form-select" multiple style="height: 120px;" required>
+                                    <option th:each="cat : ${categories}"
+                                            th:value="${cat.id}"
+                                            th:text="${cat.name}"
+                                            th:selected="${coupon.appliedCategories != null && coupon.appliedCategories.contains(cat)}">
+                                    </option>
+                                </select>
+                                <small class="text-muted">Giữ Ctrl để chọn nhiều loại sản phẩm.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giá trị giảm</label>
+                                <div class="input-group">
+                                    <input type="number" th:field="*{discountValue}" class="form-control" step="0.1" required>
+                                    <select th:field="*{discountType}" class="form-select" style="max-width: 100px;">
+                                        <option value="percent">%</option>
+                                        <option value="amount">VNĐ</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label fw-bold">Ngày bắt đầu</label>
+                                    <input type="date" th:field="*{startDate}" class="form-control" required>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label fw-bold">Ngày kết thúc</label>
+                                    <input type="date" th:field="*{endDate}" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng thái</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="statusSwitch"
+                                           th:checked="${coupon.status == 'Còn hiệu lực'}"
+                                           onclick="updateStatusValue(this)">
+                                    <label class="form-check-label" for="statusSwitch" id="statusLabel"
+                                           th:text="${coupon.status == 'Còn hiệu lực' ? 'Còn hiệu lực' : 'Hết hạn'}"></label>
+                                    <input type="hidden" th:field="*{status}" id="statusHidden">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Mô tả chi tiết</label>
+                                <textarea class="form-control" rows="4" placeholder="Nhập nội dung chi tiết về chương trình khuyến mãi..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-center border-top pt-4">
+                        <button type="submit" class="btn btn-primary px-5"
+                                th:text="${coupon.id != null ? 'Cập nhật' : 'Thêm mới'}"></button>
+                        <a th:href="@{/admin/coupons}" class="btn btn-light border px-5">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateStatusValue(checkbox) {
+            const hiddenInput = document.getElementById('statusHidden');
+            const label = document.getElementById('statusLabel');
+            if (checkbox.checked) {
+                hiddenInput.value = "Còn hiệu lực";
+                label.innerText = "Còn hiệu lực";
+            } else {
+                hiddenInput.value = "Hết hạn";
+                label.innerText = "Hết hạn";
+            }
+        }
+    </script>
+</section>
+</html>
