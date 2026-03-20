@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
+<section>
+    <div class="container-fluid mt-4" style="width: 80%" >
+        <div class="p-5 mb-4 bg-light rounded-3 border">
+            <div class="container-fluid py-5 text-center">
+                <h1 class="display-5 fw-bold text-primary">Welcome Admin!</h1>
+                <p class="col-md-12 fs-4">Chào mừng bạn quay trở lại với hệ thống quản trị cửa hàng thời trang.
+                    Hãy chọn các mục bên trái để bắt đầu quản lý.</p>
+                <hr class="my-4">
+                <p>Hôm nay là ngày: <strong th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}"></strong></p>
+            </div>
+        </div>
+    </div>
+</section>
+</html>
