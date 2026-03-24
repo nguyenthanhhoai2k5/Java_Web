@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Garden - Trang Chủ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-garden: #72B01D; --dark-navy: #22577A; --light-garden: #F0F7EE; }
+        body { font-family: 'Quicksand', sans-serif; color: var(--dark-navy); background-color: #fcfcfc; }
+
+        /* Navbar & Topbar */
+        .top-bar { background-color: var(--dark-navy); color: #fff; font-size: 13px; padding: 6px 0; }
+        .top-bar a { color: #fff; text-decoration: none; transition: 0.3s; }
+        .top-bar a:hover { color: var(--primary-garden); }
+        .navbar { background-color: #fff; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
+        .logo-text { font-size: 26px; font-weight: 700; color: var(--primary-garden); text-decoration: none; }
+        .logo-text span { color: var(--dark-navy); }
+        .nav-link { font-weight: 600; color: var(--dark-navy); margin: 0 10px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: var(--primary-garden) !important; }
+        .search-box { max-width: 250px; }
+        .search-box .form-control { font-size: 14px; border-radius: 50px 0 0 50px; }
+        .search-box .btn { border-radius: 0 50px 50px 0; background-color: var(--primary-garden); color: #fff; border: none; }
+
+        /* Sections */
+        .hero-section { background: var(--light-garden); padding: 80px 0; border-radius: 0 0 80px 80px; margin-bottom: 60px; }
+        .section-title { font-weight: 800; color: var(--dark-navy); margin-bottom: 30px; position: relative; display: inline-block; }
+        .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background-color: var(--primary-garden); border-radius: 10px; }
+
+        /* Product Cards */
+        .product-card { border: none; border-radius: 25px; border: 1px solid #f1f1f1; transition: 0.3s; background: #fff; height: 100%; position: relative; }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: var(--primary-garden); }
+        .img-box { aspect-ratio: 1/1; background: #f8f9fa; display: flex; align-items: center; justify-content: center; border-radius: 25px 25px 0 0; }
+        .badge-custom { position: absolute; top: 15px; right: 15px; font-size: 11px; padding: 5px 12px; border-radius: 50px; font-weight: 700; text-transform: uppercase; z-index: 2; }
+
+        /* Buttons & Placeholder */
+        .btn-garden { background: var(--primary-garden); color: #fff; border-radius: 50px; border: none; padding: 10px 25px; font-weight: 600; transition: 0.3s; }
+        .btn-garden:hover { background: var(--dark-navy); color: #fff; }
+        .placeholder-img { background: #fff; border: 2px dashed var(--primary-garden); border-radius: 30px; height: 400px; display: flex; align-items: center; justify-content: center; color: var(--primary-garden); }
+        .placeholder-sm { height: 250px; background: #e9ecef; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #adb5bd; }
+
+        /* Expanded Footer */
+        footer { background-color: #1A1C20; color: #fff; padding: 80px 0 40px; border-radius: 50px 50px 0 0; margin-top: 80px; }
+        .footer-title { font-weight: 700; margin-bottom: 20px; color: var(--primary-garden); text-transform: uppercase; font-size: 16px; }
+        .footer-link { color: #a0aabf; text-decoration: none; transition: 0.3s; display: block; margin-bottom: 10px; }
+        .footer-link:hover { color: #fff; padding-left: 5px; }
+        .social-icons i { font-size: 24px; margin-right: 15px; color: #a0aabf; transition: 0.3s; cursor: pointer; }
+        .social-icons i:hover { color: var(--primary-garden); }
+    </style>
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+    <div class="container">
+        <a class="logo-text" href="user_index.html"><i class="bi bi-tree-fill me-2"></i>KIDS<span>GARDEN</span></a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <i class="bi bi-list fs-1 text-dark"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-4 me-auto">
+                <li class="nav-item"><a class="nav-link active" href="user_index.html">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="user_shop.html">Cửa hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="user_promotions.html">Khuyến mãi</a></li>
+            </ul>
+            <form class="d-flex search-box me-4" action="/search" method="GET">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control border-end-0 shadow-none" placeholder="Tìm sản phẩm...">
+                    <button class="btn px-3" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                <a href="user_cart.html" class="text-dark position-relative">
+                    <i class="bi bi-handbag fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">2</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center text-center text-lg-start">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Khu Vườn <span style="color: var(--primary-garden);">Thời Trang</span> Của Bé</h1>
+                <p class="lead text-muted mb-5">Khám phá những mẫu thiết kế Organic an toàn và phong cách nhất dành cho thiên thần nhỏ.</p>
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <a href="user_shop.html" class="btn btn-garden shadow-lg">KHÁM PHÁ NGAY</a>
+                    <a href="user_promotions.html" class="btn btn-outline-dark rounded-pill px-4">XEM KHUYẾN MÃI</a>
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0">
+                <div class="placeholder-img"><i class="bi bi-image fs-1 me-2"></i> Banner Mùa Xuân</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container mb-5 pb-4 text-center">
+    <h2 class="section-title">Mầm Non Mới Nhú</h2>
+    <p class="text-muted mb-5">Những mẫu thiết kế vừa được cập nhật tuần này</p>
+    <div class="row g-4 text-start">
+        <div class="col-6 col-lg-3">
+            <div class="product-card shadow-sm">
+                <span class="badge-custom bg-success text-white">Mới</span>
+                <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                    <div class="img-box"><i class="bi bi-camera text-muted fs-1"></i></div>
+                    <div class="p-3 text-center">
+                        <h6 class="fw-bold text-dark">Váy Caro Cổ Điển</h6>
+                        <p class="text-success fw-bold mb-0">280.000đ</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="product-card shadow-sm">
+                <span class="badge-custom bg-success text-white">Mới</span>
+                <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                    <div class="img-box"><i class="bi bi-camera text-muted fs-1"></i></div>
+                    <div class="p-3 text-center">
+                        <h6 class="fw-bold text-dark">Set Đồ Bơi Rùa Biển</h6>
+                        <p class="text-success fw-bold mb-0">310.000đ</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="product-card shadow-sm">
+                <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                    <div class="img-box"><i class="bi bi-camera text-muted fs-1"></i></div>
+                    <div class="p-3 text-center">
+                        <h6 class="fw-bold text-dark">Áo Polo Bé Trai</h6>
+                        <p class="text-success fw-bold mb-0">190.000đ</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="product-card shadow-sm">
+                <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                    <div class="img-box"><i class="bi bi-camera text-muted fs-1"></i></div>
+                    <div class="p-3 text-center">
+                        <h6 class="fw-bold text-dark">Mũ Trái Cây Mùa Hè</h6>
+                        <p class="text-success fw-bold mb-0">120.000đ</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4"><a href="user_shop.html" class="btn btn-outline-dark rounded-pill px-4">Xem tất cả sản phẩm mới</a></div>
+</section>
+
+<section class="container mb-5 pb-4 text-center">
+    <h2 class="section-title">Được Yêu Thích Nhất</h2>
+    <p class="text-muted mb-5">Các sản phẩm luôn trong tình trạng cháy hàng</p>
+    <div class="row g-4 text-start">
+        <div class="col-6 col-lg-3">
+            <div class="product-card shadow-sm" style="border: 2px solid #ffc107;">
+                <span class="badge-custom bg-danger text-white"><i class="bi bi-fire me-1"></i> Bán Chạy</span>
+                <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                    <div class="img-box" style="background-color: #fffdf5;"><i class="bi bi-camera text-muted fs-1"></i></div>
+                    <div class="p-3 text-center">
+                        <h6 class="fw-bold text-dark">Yếm Kaki Đáng Yêu</h6>
+                        <p class="text-success fw-bold mb-0">350.000đ</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="product-card shadow-sm">
+                <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                    <div class="img-box"><i class="bi bi-camera text-muted fs-1"></i></div>
+                    <div class="p-3 text-center">
+                        <h6 class="fw-bold text-dark">Giày Lười Caro</h6>
+                        <p class="text-success fw-bold mb-0">220.000đ</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container mb-5 pb-4 text-center">
+    <div class="p-5 rounded-4" style="background: linear-gradient(135deg, #F0F7EE 0%, #e0f2dc 100%);">
+        <h2 class="section-title">Siêu Ưu Đãi Mùa Hè</h2>
+        <p class="text-muted mb-4">Giảm giá lên đến 50% cho bộ sưu tập đồ bơi và phụ kiện du lịch.</p>
+        <div class="row g-4 justify-content-center mb-4 text-start">
+            <div class="col-6 col-lg-3">
+                <div class="product-card shadow-sm">
+                    <span class="badge-custom bg-danger text-white">-30%</span>
+                    <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                        <div class="img-box"><i class="bi bi-camera text-muted fs-1"></i></div>
+                        <div class="p-3 text-center">
+                            <h6 class="fw-bold text-dark">Bộ Bơi Liền Thân</h6>
+                            <p class="mb-0"><del class="text-muted small me-2">300.000đ</del><span class="text-danger fw-bold">210.000đ</span></p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="product-card shadow-sm">
+                    <span class="badge-custom bg-danger text-white">-50%</span>
+                    <a href="user_product_detail.html" class="text-decoration-none color-navy">
+                        <div class="img-box"><i class="bi bi-camera text-muted fs-1"></i></div>
+                        <div class="p-3 text-center">
+                            <h6 class="fw-bold text-dark">Kính Râm Sắc Màu</h6>
+                            <p class="mb-0"><del class="text-muted small me-2">150.000đ</del><span class="text-danger fw-bold">75.000đ</span></p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <a href="user_promotions.html" class="btn btn-garden shadow">XEM TẤT CẢ KHUYẾN MÃI</a>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4 col-md-6">
+                <a class="logo-text text-white mb-4 d-block" style="font-size: 28px;" href="#"><i class="bi bi-tree-fill me-2" style="color: var(--primary-garden);"></i>KIDS<span style="color: #fff;">GARDEN</span></a>
+                <p class="text-white-50 lh-lg mb-4">Kids Garden không chỉ bán quần áo, chúng tôi cùng bạn nuôi dưỡng sự tự tin và nét hồn nhiên của bé thông qua những trang phục an toàn, thân thiện với môi trường và đậm chất thời trang.</p>
+                <div class="social-icons">
+                    <i class="bi bi-facebook"></i>
+                    <i class="bi bi-instagram"></i>
+                    <i class="bi bi-tiktok"></i>
+                    <i class="bi bi-youtube"></i>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-title">Khám Phá</h5>
+                <a href="user_shop.html" class="footer-link">Sản phẩm mới</a>
+                <a href="user_promotions.html" class="footer-link">Khuyến mãi</a>
+                <a href="#" class="footer-link">Bé trai</a>
+                <a href="#" class="footer-link">Bé gái</a>
+                <a href="#" class="footer-link">Góc làm mẹ (Blog)</a>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-title">Hỗ Trợ Khách Hàng</h5>
+                <a href="#" class="footer-link">Hướng dẫn chọn size</a>
+                <a href="#" class="footer-link">Chính sách giao hàng</a>
+                <a href="#" class="footer-link">Chính sách đổi trả</a>
+                <a href="#" class="footer-link">Câu hỏi thường gặp (FAQ)</a>
+                <a href="#" class="footer-link">Tra cứu đơn hàng</a>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-title">Liên Hệ & Đăng Ký</h5>
+                <ul class="list-unstyled text-white-50 mb-4">
+                    <li class="mb-2"><i class="bi bi-geo-alt-fill me-2 text-white"></i> 123 Nguyễn Văn Cừ, Q5, TP.HCM</li>
+                    <li class="mb-2"><i class="bi bi-envelope-fill me-2 text-white"></i> hotro@kidsgarden.vn</li>
+                    <li class="mb-2"><i class="bi bi-telephone-fill me-2 text-white"></i> 0123 456 789</li>
+                </ul>
+                <p class="small text-white-50 mb-2">Nhận thông báo khi có BST mới!</p>
+                <form class="input-group">
+                    <input type="email" class="form-control rounded-start-pill border-0" placeholder="Email của mẹ...">
+                    <button class="btn btn-garden rounded-end-pill" type="button"><i class="bi bi-send"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <hr class="border-secondary mt-5 mb-4">
+
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start text-white-50 small">
+                &copy; 2026 Kids Garden Fashion. Phát triển bởi Nhóm Đồ Án Java.
+            </div>
+            <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                <i class="bi bi-credit-card fs-4 text-white-50 mx-2"></i>
+                <i class="bi bi-paypal fs-4 text-white-50 mx-2"></i>
+                <i class="bi bi-stripe fs-4 text-white-50 mx-2"></i>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.min.js"></script>
+</body>
+</html>
