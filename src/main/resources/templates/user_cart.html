@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Garden - Giỏ Hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-garden: #72B01D;
+            --dark-navy: #22577A;
+            --light-garden: #F0F7EE;
+            --bg-white: #FFFFFF;
+        }
+
+        body { font-family: 'Quicksand', sans-serif; color: var(--dark-navy); background-color: #f8f9fa; }
+
+        /* Top Bar & Navbar */
+        .top-bar { background-color: var(--dark-navy); color: #fff; font-size: 13px; padding: 6px 0; }
+        .top-bar a { color: #fff; text-decoration: none; transition: 0.3s; }
+        .top-bar a:hover { color: var(--primary-garden); }
+
+        .navbar { background-color: #fff; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
+        .logo-text { font-size: 26px; font-weight: 700; color: var(--primary-garden); text-decoration: none; }
+        .logo-text span { color: var(--dark-navy); }
+
+        .nav-link { font-weight: 600; color: var(--dark-navy); margin: 0 10px; }
+        .search-box { max-width: 250px; }
+        .search-box .form-control { font-size: 14px; border-radius: 50px 0 0 50px; }
+        .search-box .btn { border-radius: 0 50px 50px 0; background-color: var(--primary-garden); color: #fff; border: none; }
+
+        /* Cart Styles */
+        .cart-table th { background-color: var(--light-garden); color: var(--dark-navy); font-weight: 700; border-bottom: none; }
+        .cart-table td { vertical-align: middle; border-color: #f1f1f1; padding: 20px 10px; }
+        .img-thumbnail-cart { width: 80px; height: 80px; object-fit: cover; border-radius: 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; }
+
+        .btn-garden { background-color: var(--primary-garden); color: #fff; border-radius: 50px; border: none; font-weight: 700; padding: 12px; transition: 0.3s; }
+        .btn-garden:hover { background-color: var(--dark-navy); color: #fff; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+    <div class="container">
+        <a class="logo-text" href="user_index.html"><i class="bi bi-tree-fill me-2"></i>KIDS<span>GARDEN</span></a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <i class="bi bi-list fs-1 text-dark"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-4 me-auto">
+                <li class="nav-item"><a class="nav-link" href="user_index.html">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="user_shop.html">Cửa hàng</a></li>
+            </ul>
+
+            <form class="d-flex search-box me-4" action="/search" method="GET">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control border-end-0 shadow-none" placeholder="Tìm sản phẩm...">
+                    <button class="btn px-3" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+
+            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                <a href="user_cart.html" class="text-success position-relative">
+                    <i class="bi bi-handbag-fill fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">2</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5 pb-5">
+    <h2 class="fw-bold mb-4 text-center"><i class="bi bi-cart-check-fill me-2 text-success"></i>Giỏ Hàng Của Bạn</h2>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+                <form action="/cart/update" method="POST">
+                    <div class="table-responsive">
+                        <table class="table cart-table mb-0">
+                            <thead>
+                            <tr class="text-uppercase small">
+                                <th style="border-radius: 15px 0 0 15px;">Sản phẩm</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
+                                <th style="border-radius: 0 15px 15px 0;">Xóa</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="img-thumbnail-cart">
+                                            <i class="bi bi-camera text-muted fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <a href="user_product_detail.html" class="fw-bold text-decoration-none text-dark d-block mb-1">Váy Hoa Nhí Garden Organic</a>
+                                            <span class="badge bg-light text-dark border">Size: 3 - 4 tuổi</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="fw-bold">350.000đ</td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm text-center rounded-pill" name="quantities[1]" value="1" min="1" style="width: 70px;">
+                                </td>
+                                <td class="fw-bold text-success">350.000đ</td>
+                                <td>
+                                    <a href="/cart/remove/1" class="btn btn-sm btn-outline-danger rounded-circle"><i class="bi bi-trash3"></i></a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="user_shop.html" class="btn btn-outline-secondary rounded-pill px-4"><i class="bi bi-arrow-left me-2"></i>Tiếp tục mua hàng</a>
+                        <button type="submit" class="btn btn-outline-success rounded-pill px-4"><i class="bi bi-arrow-repeat me-2"></i>Cập nhật giỏ hàng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+                <h5 class="fw-bold mb-4 border-bottom pb-3">Tóm tắt đơn hàng</h5>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Tạm tính:</span>
+                    <span class="fw-bold">350.000đ</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Phí vận chuyển:</span>
+                    <span>Sẽ tính khi thanh toán</span>
+                </div>
+
+                <hr class="text-muted my-4">
+
+                <div class="d-flex justify-content-between mb-4 align-items-center">
+                    <span class="fw-bold fs-5">Tổng tiền:</span>
+                    <span class="fw-bold fs-4 text-success">350.000đ</span>
+                </div>
+
+                <button class="btn btn-garden w-100 shadow-sm">TIẾN HÀNH THANH TOÁN</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.min.js"></script>
+</body>
+</html>

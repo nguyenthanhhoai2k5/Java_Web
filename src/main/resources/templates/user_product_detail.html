@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Garden - Chi Tiết Sản Phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-garden: #72B01D;
+            --dark-navy: #22577A;
+            --light-garden: #F0F7EE;
+            --bg-white: #FFFFFF;
+        }
+
+        body { font-family: 'Quicksand', sans-serif; color: var(--dark-navy); background-color: #f8f9fa; }
+
+        /* Top Bar & Navbar */
+        .top-bar { background-color: var(--dark-navy); color: #fff; font-size: 13px; padding: 6px 0; }
+        .top-bar a { color: #fff; text-decoration: none; transition: 0.3s; }
+        .top-bar a:hover { color: var(--primary-garden); }
+
+        .navbar { background-color: #fff; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
+        .logo-text { font-size: 26px; font-weight: 700; color: var(--primary-garden); text-decoration: none; }
+        .logo-text span { color: var(--dark-navy); }
+
+        .nav-link { font-weight: 600; color: var(--dark-navy); margin: 0 10px; }
+        .nav-link:hover { color: var(--primary-garden); }
+
+        /* Search Bar Nhỏ Gọn */
+        .search-box { max-width: 250px; } /* Làm nhỏ thanh tìm kiếm */
+        .search-box .form-control { font-size: 14px; border-radius: 50px 0 0 50px; }
+        .search-box .btn { border-radius: 0 50px 50px 0; background-color: var(--primary-garden); color: #fff; border: none; }
+
+        /* Product Detail Styles */
+        .product-gallery { background: #fff; border-radius: 30px; height: 500px; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; }
+        .btn-garden { background-color: var(--primary-garden); color: #fff; border-radius: 50px; border: none; font-weight: 700; transition: 0.3s; }
+        .btn-garden:hover { background-color: var(--dark-navy); color: #fff; }
+
+        /* Footer */
+        footer { background-color: #1A1C20; color: #fff; padding: 60px 0 20px; border-radius: 50px 50px 0 0; margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+    <div class="container">
+        <a class="logo-text" href="user_index.html"><i class="bi bi-tree-fill me-2"></i>KIDS<span>GARDEN</span></a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <i class="bi bi-list fs-1 text-dark"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-4 me-auto">
+                <li class="nav-item"><a class="nav-link" href="user_index.html">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="user_shop.html">Cửa hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Khuyến mãi</a></li>
+            </ul>
+
+            <form class="d-flex search-box me-4" action="/search" method="GET">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control border-end-0 shadow-none" placeholder="Tìm sản phẩm...">
+                    <button class="btn px-3" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+
+            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                <a href="user_cart.html" class="text-dark position-relative">
+                    <i class="bi bi-handbag fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">2</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="user_index.html" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="user_shop.html" class="text-decoration-none text-muted">Bé gái</a></li>
+            <li class="breadcrumb-item active fw-bold" aria-current="page">Váy Hoa Nhí Garden Organic</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5 bg-white p-4 rounded-4 shadow-sm border border-light">
+        <div class="col-md-5">
+            <div class="product-gallery">
+                <i class="bi bi-camera text-muted" style="font-size: 80px;"></i>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <span class="badge bg-danger mb-2">Hàng Bán Chạy</span>
+            <h2 class="fw-bold mb-2">Váy Hoa Nhí Garden Organic</h2>
+            <p class="text-muted small mb-4">Danh mục: Thời trang bé gái | Mã SP: SP-0012</p>
+
+            <h3 class="text-success fw-bold mb-4">350.000đ</h3>
+
+            <p class="mb-4 text-secondary">
+                Váy hoa nhí được làm từ 100% sợi cotton organic, thấm hút mồ hôi cực tốt. Thiết kế thoải mái giúp bé tự do vận động trong những ngày hè oi bức. An toàn tuyệt đối cho làn da nhạy cảm của bé.
+            </p>
+
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Chọn độ tuổi:</h6>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="size" id="size1" checked>
+                    <label class="btn btn-outline-secondary rounded-pill me-2 px-3" for="size1">1 - 2 tuổi</label>
+
+                    <input type="radio" class="btn-check" name="size" id="size2">
+                    <label class="btn btn-outline-secondary rounded-pill me-2 px-3" for="size2">3 - 4 tuổi</label>
+
+                    <input type="radio" class="btn-check" name="size" id="size3">
+                    <label class="btn btn-outline-secondary rounded-pill px-3" for="size3">5 - 6 tuổi</label>
+                </div>
+            </div>
+
+            <form action="/cart/add" method="POST">
+                <input type="hidden" name="productId" value="1">
+                <div class="d-flex align-items-center gap-4 mb-4">
+                    <div class="input-group" style="width: 130px;">
+                        <button class="btn btn-outline-secondary rounded-start-pill px-3" type="button">-</button>
+                        <input type="text" class="form-control text-center border-secondary" name="quantity" value="1">
+                        <button class="btn btn-outline-secondary rounded-end-pill px-3" type="button">+</button>
+                    </div>
+                    <span class="text-muted small">Còn 15 sản phẩm</span>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-garden btn-lg px-5 shadow-sm"><i class="bi bi-cart-plus me-2"></i>THÊM VÀO GIỎ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container text-center">
+        <h5 class="fw-bold text-white mb-3"><i class="bi bi-tree-fill"></i> KIDS GARDEN</h5>
+        <p class="text-white-50 small mb-0">© 2026 Kids Garden Fashion. Ươm mầm phong cách Việt.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.min.js"></script>
+</body>
+</html>
