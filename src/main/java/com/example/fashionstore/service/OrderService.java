@@ -1,6 +1,7 @@
 package com.example.fashionstore.service;
 
 import com.example.fashionstore.model.OrderDetail;
+import com.example.fashionstore.repository.OrderDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
