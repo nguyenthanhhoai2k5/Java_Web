@@ -2,12 +2,15 @@ package com.example.fashionstore.controller;
 
 import com.example.fashionstore.model.Category;
 import com.example.fashionstore.model.Coupon;
+import com.example.fashionstore.model.Order;
+import com.example.fashionstore.model.OrderDetail;
 import com.example.fashionstore.model.Product;
-import com.example.fashionstore.repository.CategoryRepository;
 import com.example.fashionstore.repository.CouponRepository;
 import com.example.fashionstore.service.CategoryService;
 import com.example.fashionstore.service.CouponService;
+import com.example.fashionstore.service.OrderService;
 import com.example.fashionstore.service.ProductService;
+import com.example.fashionstore.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -16,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,87 +32,63 @@ import java.util.Set;
 public class AdminController {
 
     @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired // Phải có thêm dòng này
     private CategoryService categoryService;
 
     @Autowired
     private ProductService productService;
 
     @Autowired
-    private CouponRepository couponRepository;
-
-    @Autowired
     private CouponService couponService;
 
-    // Home
+    @Autowired
+    private CouponRepository couponRepository; // Giữ lại vì một số logic trước đó của bạn đang dùng trực tiếp
+
+    // Tích hợp Service mới cho chức năng 4 và 5
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private StatisticsService statisticsService;
+
+    // ==============================================================
+    // TRANG CHỦ ADMIN (DASHBOARD)
+    // ==============================================================
     @GetMapping({"/", "/home"})
     public String adminHome(Model model) {
         model.addAttribute("page", "home"); // Để active nút Trang chủ trên menu
+
+        // Cập nhật thống kê thực tế cho Dashboard từ StatisticsService
+        model.addAttribute("totalOrders", statisticsService.getCurrentMonthOrderCount());
+        model.addAttribute("totalSales", statisticsService.getCurrentMonthSalesFormatted());
+        model.addAttribute("totalProducts", productService.getAll().size());
+
         return "admin_home";
     }
 
-    @GetMapping("/category") // Điều hướng trang đến Quản lý danh mục
+    // ==============================================================
+    // QUẢN LÝ DANH MỤC & SẢN PHẨM (Chức năng 1)
+    // ==============================================================
+    @GetMapping("/category")
     public String manageCategory(Model model,
                                  @RequestParam(value = "keyword", required = false) String keyword,
                                  @RequestParam(value = "p", defaultValue = "1") int pageNum){
         model.addAttribute("categories", categoryService.getAll());
         model.addAttribute("category", new Category());
 
-        List<Product> products;
         if (keyword != null && !keyword.isEmpty()) {
-            products = productService.searchByName(keyword);
-            model.addAttribute("keyword", keyword); // Gửi lại keyword để hiển thị trên ô nhập
-        } else {
-            products = productService.getAll();
+            model.addAttribute("keyword", keyword);
         }
 
-        // Gọi hàm phân trang từ Service
         Page<Product> page = productService.getAllPaged(pageNum, keyword);
 
-        model.addAttribute("products", page.getContent()); // Danh sách sp trên trang này
-        model.addAttribute("products", products);
+        model.addAttribute("products", page.getContent());
         model.addAttribute("page", "category");
         return "admin_category";
     }
 
-    // Điều hướng đến trang danh sách mã giảm giá
-    @GetMapping("/coupons")
-    public String manageCoupons(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-        List<Coupon> coupons;
-
-        if (keyword != null && !keyword.isEmpty()) {
-            coupons = couponService.searchCoupons(keyword);
-            model.addAttribute("keyword", keyword); // Gửi lại keyword để hiển thị ở ô nhập
-        } else {
-            coupons = couponService.getAll();
-        }
-
-        model.addAttribute("coupons", coupons);
-        model.addAttribute("page", "coupons");
-        return "admin_coupon_list";
-    }
-
-    // Điều hướng đến trang thêm mã giảm giá
-    @GetMapping("/coupons/add")
-    public String addCouponPage(Model model) {
-        model.addAttribute("coupon", new Coupon());
-        model.addAttribute("categories", categoryService.getAll()); // Để chọn loại SP áp dụng
-        model.addAttribute("page", "coupons");
-        return "admin_coupon_add";
-    }
-
-    @GetMapping("/statistics")
-    public String showStatistics(Model model) {
-        model.addAttribute("page", "statistics");
-        return "admin_statistics";
-    }
-
-    // Thêm
     @PostMapping("/category/save")
     public String saveCategory(@ModelAttribute("category") Category category) {
-        categoryService.save(category); // JPA tự hiểu: có ID là Update, không ID là Insert
+        categoryService.save(category);
         return "redirect:/admin/category";
     }
 
@@ -120,48 +98,33 @@ public class AdminController {
         return "redirect:/admin/category";
     }
 
-    // Chỉnh sửa
     @GetMapping("/category/edit/{id}")
     public String editCategory(@PathVariable("id") Long id, Model model) {
         model.addAttribute("categories", categoryService.getAll());
-        model.addAttribute("category", categoryService.getById(id)); // Lấy dữ liệu cũ để sửa
+        model.addAttribute("category", categoryService.getById(id));
         model.addAttribute("page", "category");
         return "admin_category";
     }
-    //  Controller nút thm sản phẩm .
+
     @GetMapping("/product/add")
     public String addProductPage(Model model) {
-        // 1. Phải gửi một đối tượng Product trống để Thymeleaf liên kết (bind) dữ liệu form
-        Product product = new Product();
-        product.setCategory(new Category());
-        model.addAttribute("product", product);
-
-        // 2. Gửi danh sách categories để đổ vào Selectbox
+        model.addAttribute("product", new Product());
         model.addAttribute("categories", categoryService.getAll());
-
         model.addAttribute("page", "category");
         return "admin_product_add";
     }
 
-    // Lưu sản phẩm va database:
     @PostMapping("/product/save")
     public String saveProduct(@ModelAttribute("product") Product product,
                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                               RedirectAttributes ra) {
         try {
-            if (product.getCategory() != null && product.getCategory().getId() != null) {
-                product.setCategory(categoryService.getById(product.getCategory().getId()));
-            }
-
             if (imageFile != null && !imageFile.isEmpty()) {
-                // Có upload ảnh mới -> Lưu ảnh mới
                 String fileName = imageFile.getOriginalFilename();
                 Path path = Paths.get("src/main/resources/static/images/" + fileName);
                 Files.copy(imageFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                 product.setImage(fileName);
             }
-            // Nếu imageFile trống, đối tượng 'product' đã có sẵn tên ảnh cũ từ input hidden
-
             productService.save(product);
             ra.addFlashAttribute("message", "Dữ liệu sản phẩm đã được cập nhật!");
         } catch (Exception e) {
@@ -170,7 +133,6 @@ public class AdminController {
         return "redirect:/admin/category";
     }
 
-    // 1. Mở trang chỉnh sửa sản phẩm
     @GetMapping("/product/edit/{id}")
     public String editProductPage(@PathVariable("id") Long id, Model model) {
         Product product = productService.getById(id);
@@ -178,30 +140,52 @@ public class AdminController {
             model.addAttribute("product", product);
             model.addAttribute("categories", categoryService.getAll());
             model.addAttribute("page", "category");
-            return "admin_product_add"; // Dùng chung form với trang Thêm
+            return "admin_product_add";
         }
         return "redirect:/admin/category";
     }
 
-    // 2. Xử lý xóa sản phẩm
     @GetMapping("/product/delete/{id}")
     public String deleteProduct(@PathVariable("id") Long id, RedirectAttributes ra) {
         Product product = productService.getById(id);
         if (product != null) {
-            // (Tùy chọn) Xóa file ảnh vật lý trong thư mục static/images nếu muốn
             try {
                 Path path = Paths.get("src/main/resources/static/images/" + product.getImage());
                 Files.deleteIfExists(path);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
             productService.delete(id);
             ra.addFlashAttribute("message", "Đã xóa sản phẩm thành công!");
         }
         return "redirect:/admin/category";
     }
-    // Lưu mã giảm giá vào database
+
+    // ==============================================================
+    // QUẢN LÝ MÃ GIẢM GIÁ (Chức năng 2)
+    // ==============================================================
+    @GetMapping("/coupons")
+    public String manageCoupons(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
+        List<Coupon> coupons;
+        if (keyword != null && !keyword.isEmpty()) {
+            coupons = couponService.searchCoupons(keyword);
+            model.addAttribute("keyword", keyword);
+        } else {
+            coupons = couponService.getAll();
+        }
+        model.addAttribute("coupons", coupons);
+        model.addAttribute("page", "coupons");
+        return "admin_coupon_list";
+    }
+
+    @GetMapping("/coupons/add")
+    public String addCouponPage(Model model) {
+        model.addAttribute("coupon", new Coupon());
+        model.addAttribute("categories", categoryService.getAll());
+        model.addAttribute("page", "coupons");
+        return "admin_coupon_add";
+    }
+
     @PostMapping("/coupons/save")
     public String saveCoupon(@ModelAttribute("coupon") Coupon coupon,
                              @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
@@ -210,33 +194,31 @@ public class AdminController {
             if (categoryIds != null && !categoryIds.isEmpty()) {
                 Set<Category> categories = new HashSet<>();
                 for (Long id : categoryIds) {
-                    Category cat = categoryService.getById(id); // Lấy category thật từ DB
+                    Category cat = categoryService.getById(id);
                     if (cat != null) categories.add(cat);
                 }
                 coupon.setAppliedCategories(categories);
             }
-
-            // Đảm bảo các trường không bị null nếu form để trống
             if (coupon.getStatus() == null) coupon.setStatus("Còn hiệu lực");
-
-            couponRepository.save(coupon); // Lưu vào DB
+            couponService.save(coupon);
             ra.addFlashAttribute("message", "Lưu mã giảm giá thành công!");
         } catch (Exception e) {
-            e.printStackTrace(); // Xem lỗi chi tiết ở console IntelliJ
+            e.printStackTrace();
             ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
             return "redirect:/admin/coupons/add";
         }
         return "redirect:/admin/coupons";
     }
-    // Chỉnh sửa mã giảm giá.
+
     @GetMapping("/coupons/edit/{id}")
     public String editCoupon(@PathVariable("id") Long id, Model model) {
         Coupon coupon = couponRepository.findById(id).orElse(null);
         model.addAttribute("coupon", coupon);
         model.addAttribute("categories", categoryService.getAll());
+        model.addAttribute("page", "coupons");
         return "admin_coupon_add";
     }
-    // Xóa mã giảm giá
+
     @GetMapping("/coupons/delete/{id}")
     public String deleteCoupon(@PathVariable("id") Long id, RedirectAttributes ra) {
         try {
@@ -248,6 +230,66 @@ public class AdminController {
         return "redirect:/admin/coupons";
     }
 
+    // ==============================================================
+    // CHỨC NĂNG 4: QUẢN LÝ ĐƠN HÀNG
+    // ==============================================================
+    @GetMapping("/order")
+    public String manageOrders(Model model,
+                               @RequestParam(value = "keyword", required = false) String keyword) {
 
-    // Bạn có thể thêm các @GetMapping khác cho Coupon, Customer, Order tương tự
+        model.addAttribute("page", "orders");
+
+        List<Order> orders;
+        if (keyword != null && !keyword.isEmpty()) {
+            orders = orderService.searchOrders(keyword);
+            model.addAttribute("keyword", keyword);
+        } else {
+            orders = orderService.getAllOrders();
+        }
+
+        model.addAttribute("orders", orders);
+        model.addAttribute("totalOrders", orders.size());
+
+        return "admin_order_list";
+    }
+
+    @PostMapping("/orders/update-status")
+    public String updateOrderStatus(@RequestParam("orderId") Long orderId,
+                                    @RequestParam("status") String status,
+                                    RedirectAttributes ra) {
+        try {
+            orderService.updateStatus(orderId, status);
+            ra.addFlashAttribute("message", "Đã cập nhật trạng thái đơn hàng thành công!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Lỗi cập nhật: " + e.getMessage());
+        }
+        return "redirect:/admin/order";
+    }
+
+    @GetMapping("/orders/detail/{id}")
+    public String viewOrderDetail(@PathVariable("id") Long id, Model model) {
+        Order order = orderService.getOrderById(id);
+        List<OrderDetail> details = orderService.getOrderDetails(id);
+
+        model.addAttribute("order", order);
+        model.addAttribute("orderDetails", details);
+        model.addAttribute("page", "orders");
+
+        return "admin_order_detail";
+    }
+
+    // ==============================================================
+    // CHỨC NĂNG 5: BÁO CÁO THỐNG KÊ
+    // ==============================================================
+    @GetMapping("/statistics")
+    public String showStatistics(Model model) {
+        model.addAttribute("page", "statistics");
+
+        // Gọi Service để lấy dữ liệu thống kê đẩy ra View
+        model.addAttribute("currentMonthSales", statisticsService.getCurrentMonthSalesFormatted());
+        model.addAttribute("currentMonthOrders", statisticsService.getCurrentMonthOrderCount());
+        model.addAttribute("bestSellingProduct", statisticsService.getBestSellingProduct());
+
+        return "admin_statistics";
+    }
 }
