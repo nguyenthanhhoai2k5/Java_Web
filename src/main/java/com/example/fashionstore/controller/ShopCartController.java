@@ -25,7 +25,9 @@ public class ShopCartController {
         model.addAttribute("cartItems", shopCartService.getCartItems(session));
         model.addAttribute("totalAmount", shopCartService.getTotalAmount(session));
         model.addAttribute("totalItems", shopCartService.getTotalItems(session));
-        return "shop/cart";
+
+        // Đã sửa dòng này để trỏ đúng vào file user_cart.html trong thư mục templates
+        return "user_cart";
     }
 
     @PostMapping("/add")
@@ -35,7 +37,7 @@ public class ShopCartController {
                               RedirectAttributes redirectAttributes) {
         shopCartService.addItem(productId, quantity, session);
         redirectAttributes.addFlashAttribute("message", "Đã thêm sản phẩm vào giỏ hàng");
-        return "redirect:/shop/cart";
+        return "redirect:/shop/cart"; // Giữ nguyên vì đây là URL redirect
     }
 
     @PostMapping("/update")
@@ -45,7 +47,7 @@ public class ShopCartController {
                                          RedirectAttributes redirectAttributes) {
         shopCartService.updateItemQuantity(productId, quantity, session);
         redirectAttributes.addFlashAttribute("message", "Đã cập nhật giỏ hàng");
-        return "redirect:/shop/cart";
+        return "redirect:/shop/cart"; // Giữ nguyên vì đây là URL redirect
     }
 
     @PostMapping("/remove")
@@ -54,6 +56,6 @@ public class ShopCartController {
                                  RedirectAttributes redirectAttributes) {
         shopCartService.removeItem(productId, session);
         redirectAttributes.addFlashAttribute("message", "Đã xóa sản phẩm khỏi giỏ hàng");
-        return "redirect:/shop/cart";
+        return "redirect:/shop/cart"; // Giữ nguyên vì đây là URL redirect
     }
 }
