@@ -1,31 +1,10 @@
-### Java ###
-*.class
-
-### Maven ###
+HELP.md
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Bỏ comment dòng dưới nếu bạn không muốn push file jar của maven wrapper lên git (giúp giảm dung lượng)
-# .mvn/wrapper/maven-wrapper.jar
-
-### IDE - IntelliJ IDEA ###
-.idea/
-*.iws
-*.iml
-*.ipr
-out/
-
-### IDE - VS Code ###
-.vscode/
-
-### IDE - Eclipse ###
+### STS ###
 .apt_generated
 .classpath
 .factorypath
@@ -34,14 +13,21 @@ out/
 .springBeans
 .sts4-cache
 
-### OS Files ###
-.DS_Store
-Thumbs.db
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
-### Application Logs ###
-*.log
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### Secrets & Environment Variables ###
-.env
-application-secret.properties
-application-secret.yml
+### VS Code ###
+.vscode/
