@@ -28,6 +28,7 @@ public class Product {
 
     private String image; // Lưu tên file ảnh hoặc đường dẫn ảnh
     private double price;
+    private Integer soldQuantity = 0;
     // Thiết lập mối quan hệ với bảng Category
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
