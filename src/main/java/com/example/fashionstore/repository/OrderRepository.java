@@ -15,6 +15,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Tìm kiếm đơn hàng theo mã đơn hoặc số điện thoại
     List<Order> findByOrderCodeContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrderByOrderDateDesc(String orderCode, String phone);
 
+    // Lấy danh sách đơn hàng của một User cụ thể, sắp xếp mới nhất lên trước
+    List<Order> findByUserOrderByOrderDateDesc(com.example.fashionstore.model.User user);
     // ==========================================
     // CÁC QUERY DÀNH CHO STATISTIC (THỐNG KÊ)
     // ==========================================
@@ -26,4 +28,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // 2. Đếm số lượng đơn hàng trong tháng hiện tại
     @Query("SELECT COUNT(o) FROM Order o WHERE MONTH(o.orderDate) = MONTH(CURRENT_DATE()) AND YEAR(o.orderDate) = YEAR(CURRENT_DATE())")
     Long countCurrentMonthOrders();
+
+    // Đếm số lượng đơn hàng theo từng trạng thái (Doughnut Chart)
+    @Query("SELECT o.status, COUNT(o) FROM Order o GROUP BY o.status")
+    List<Object[]> countOrdersByStatus();
+
+    // Lấy doanh thu theo tháng trong năm nay (Line Chart) - Dùng Native Query của MySQL
+    @Query(value = "SELECT MONTH(order_date), SUM(total_amount) FROM orders WHERE YEAR(order_date) = YEAR(CURRENT_DATE()) AND status != 'Đã hủy' GROUP BY MONTH(order_date) ORDER BY MONTH(order_date)", nativeQuery = true)
+    List<Object[]> getRevenueByMonth();
+
+
+
 }

@@ -18,4 +18,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     // ==========================================
     @Query("SELECT p.name, SUM(od.quantity) as totalQty FROM OrderDetail od JOIN od.product p GROUP BY p.id, p.name ORDER BY totalQty DESC")
     List<Object[]> findTopSellingProducts(Pageable pageable);
+
+    // Tính tổng doanh thu theo từng Danh mục (Pie Chart)
+    @Query("SELECT c.name, SUM(od.subTotal) FROM OrderDetail od JOIN od.product p JOIN p.category c JOIN od.order o WHERE o.status != 'Đã hủy' GROUP BY c.name")
+    List<Object[]> getRevenueByCategory();
 }

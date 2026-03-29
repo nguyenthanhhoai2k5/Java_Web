@@ -285,10 +285,16 @@ public class AdminController {
     public String showStatistics(Model model) {
         model.addAttribute("page", "statistics");
 
-        // Gọi Service để lấy dữ liệu thống kê đẩy ra View
+        // 3 Thẻ tổng quan
         model.addAttribute("currentMonthSales", statisticsService.getCurrentMonthSalesFormatted());
         model.addAttribute("currentMonthOrders", statisticsService.getCurrentMonthOrderCount());
         model.addAttribute("bestSellingProduct", statisticsService.getBestSellingProduct());
+
+        // Dữ liệu cho 4 biểu đồ
+        model.addAttribute("statusChart", statisticsService.getOrderStatusData());
+        model.addAttribute("topProductsChart", statisticsService.getTopProductsData());
+        model.addAttribute("categoryChart", statisticsService.getCategoryRevenueData());
+        model.addAttribute("monthlyChart", statisticsService.getMonthlyRevenueData());
 
         return "admin_statistics";
     }

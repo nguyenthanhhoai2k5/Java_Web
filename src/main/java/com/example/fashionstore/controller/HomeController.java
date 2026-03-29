@@ -1,5 +1,6 @@
 package com.example.fashionstore.controller;
 
+import com.example.fashionstore.model.Coupon;
 import com.example.fashionstore.service.CategoryService;
 import com.example.fashionstore.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -16,6 +19,9 @@ public class HomeController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private com.example.fashionstore.service.CouponService couponService;
 
     // TRANG CHỦ NGƯỜI DÚNG
     @GetMapping({"/", "/home"})
@@ -44,6 +50,8 @@ public class HomeController {
     // TRANG KHUYẾN MÃI
     @GetMapping("/promotions")
     public String promotionsPage(Model model) {
+        List<Coupon> activeCoupons = couponService.getActiveCoupons();
+        model.addAttribute("activeCoupons", activeCoupons);
         model.addAttribute("saleProducts", productService.getSaleProducts());
         return "user_promotions"; // Trả về file user_promotions.html
     }
