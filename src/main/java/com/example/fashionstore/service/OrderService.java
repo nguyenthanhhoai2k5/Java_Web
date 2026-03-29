@@ -1,9 +1,6 @@
 package com.example.fashionstore.service;
 
-import com.example.fashionstore.model.CartItem;
-import com.example.fashionstore.model.Order;
-import com.example.fashionstore.model.OrderDetail;
-import com.example.fashionstore.model.Product;
+import com.example.fashionstore.model.*;
 import com.example.fashionstore.repository.OrderDetailRepository;
 import com.example.fashionstore.repository.OrderRepository;
 import com.example.fashionstore.repository.ProductRepository;
@@ -102,5 +99,11 @@ public class OrderService {
         }
 
         return savedOrder;
+    }
+
+    // Lấy lịch sử mua hàng của khách hàng
+    public List<Order> getOrdersByUser(User user) {
+        if (user == null) return new java.util.ArrayList<>();
+        return orderRepository.findByUserOrderByOrderDateDesc(user);
     }
 }
