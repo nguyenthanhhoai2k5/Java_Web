@@ -44,4 +44,29 @@ public class ProductService {
         }
         return repository.findAll(pageable);
     }
+    // ==============================================================
+    // CÁC HÀM BỔ SUNG ĐỂ SỬA LỖI "CANNOT FIND SYMBOL" TRONG HomeController
+    // ==============================================================
+
+    public List<Product> getProductsByCategory(Long categoryId) {
+        if (categoryId == null) {
+            return repository.findAll();
+        }
+        return repository.findByCategoryId(categoryId);
+    }
+
+    public List<Product> getNewestProducts() {
+        return repository.findTop8ByOrderByIdDesc();
+    }
+
+    public List<Product> getBestSellingProducts() {
+        // LƯU Ý: Đảm bảo trong class Product.java đã có thuộc tính:
+        // private Integer soldQuantity;
+        return repository.findTop8ByOrderBySoldQuantityDesc();
+    }
+
+    public List<Product> getSaleProducts() {
+        // Tìm các sản phẩm có trạng thái "SALE" hoặc "Khuyến mãi"
+        return repository.findByStatusIgnoreCase("SALE");
+    }
 }

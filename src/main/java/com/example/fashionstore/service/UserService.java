@@ -34,10 +34,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // Xóa tài khoản
-    public void softDelete(Long id) {
-        User user = userRepository.findById(id).get();
-        user.setEnabled(false); // Vô hiệu hóa tài khoản
-        userRepository.save(user);
+    // UserService.java
+    @Transactional
+    public void delete(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Không tìm thấy người dùng để xóa!");
+        }
     }
 }

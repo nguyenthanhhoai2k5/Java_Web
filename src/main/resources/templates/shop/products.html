@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách sản phẩm</title>
+</head>
+<body>
+<header>
+    <h1>Danh sách sản phẩm</h1>
+    <p>
+        <a th:href="@{/shop/cart}">
+            Giỏ hàng (<span th:text="${cartCount}">0</span>)
+        </a>
+    </p>
+</header>
+
+<section>
+    <form th:action="@{/shop/products}" method="get">
+        <label for="keyword">Tìm kiếm theo tên sản phẩm</label>
+        <input id="keyword"
+               type="text"
+               name="keyword"
+               th:value="${keyword}"
+               placeholder="Nhập tên sản phẩm">
+        <button type="submit">Tìm kiếm</button>
+    </form>
+</section>
+
+<hr>
+
+<section th:if="${#lists.isEmpty(products)}">
+    <p>Không tìm thấy sản phẩm nào.</p>
+</section>
+
+<section th:if="${!#lists.isEmpty(products)}">
+    <article th:each="product : ${products}" style="margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 12px;">
+        <h2 th:text="${product.name}">Tên sản phẩm</h2>
+        <p>Giá: <span th:text="${T(java.lang.Math).round(product.price) + ' VND'}">0 VND</span></p>
+        <p>
+            <a th:href="@{/shop/products/{productId}(productId=${product.id})}">Xem chi tiết</a>
+        </p>
+
+        <form th:action="@{/shop/cart/add}" method="post">
+            <input type="hidden" name="productId" th:value="${product.id}">
+            <label th:for="${'quantity-' + product.id}">Số lượng</label>
+            <input th:id="${'quantity-' + product.id}" type="number" name="quantity" value="1" min="1">
+            <button type="submit">Thêm vào giỏ</button>
+        </form>
+    </article>
+</section>
+</body>
+</html>

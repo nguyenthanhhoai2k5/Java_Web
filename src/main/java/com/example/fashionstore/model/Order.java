@@ -1,23 +1,38 @@
 package com.example.fashionstore.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.time.LocalDate;
-import java.util.List;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "orders") @Data
+@Table(name = "orders")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne @JoinColumn(name = "user_id")
-    private User user;
+    // Mã đơn hàng hiển thị (VD: OD000001)
+    private String orderCode;
 
-    private LocalDate orderDate;
-    private String status; // "Đã giao", "Đang xử lý", "Đã hủy"
+    private String customerName;
+    private String phone;
+    private String address;
+    private String email;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderDetail> details;
+    private Double totalAmount;
+
+    // Trạng thái: "Đang xử lý", "Đã giao hàng", "Đã hủy"
+    private String status;
+
+    @Column(name = "order_date")
+    private LocalDateTime orderDate = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "user_id") // Tên cột khóa ngoại trong bảng orders ở database
+    private User user; // Biến này PHẢI tên là "user" để khớp với mappedBy bên lớp User
 }

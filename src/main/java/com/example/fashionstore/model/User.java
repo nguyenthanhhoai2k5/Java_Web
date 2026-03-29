@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -34,4 +36,8 @@ public class User {
 
     // Trạng thái tài khoản (Tùy chọn: true là đang hoạt động)
     private boolean enabled = true;
+
+    // Liên kết với oder
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Order> orders;
 }

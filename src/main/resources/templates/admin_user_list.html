@@ -14,6 +14,16 @@
 
     <div class="card shadow border-0">
       <div class="table-responsive">
+        <!--Thông báo lỗi-->
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <span th:text="${errorMessage}"></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+          <span th:text="${successMessage}"></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <table class="table table-hover align-middle mb-0">
           <thead class="table-dark">
           <tr>
@@ -48,8 +58,8 @@
               </a>
               <a th:href="@{'/admin/users/delete/' + ${user.id}}"
                  class="btn btn-sm btn-outline-danger"
-                 onclick="return confirm('Xác nhận xóa tài khoản này?')">
-                <i class="bi bi-person-x"></i> Xóa
+                 onclick="return confirm('Cảnh báo: Hành động này có thể xóa toàn bộ lịch sử mua hàng của người dùng. Bạn vẫn muốn tiếp tục?')">
+                <i class="bi bi-person-x"></i> Xóa tài khoản
               </a>
             </td>
           </tr>
