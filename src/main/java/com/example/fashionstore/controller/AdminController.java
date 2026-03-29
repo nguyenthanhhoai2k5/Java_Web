@@ -309,7 +309,7 @@ public class AdminController {
         }
 
         // Lấy danh sách chi tiết mua hàng
-        List<OrderDetail> history = orderService.getHistoryByUserId(id);
+        List<OrderDetail> history = orderService.getOrderDetails(id);
 
         model.addAttribute("user", user);
         model.addAttribute("history", history);

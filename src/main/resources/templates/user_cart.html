@@ -17,7 +17,6 @@
         .logo-text { font-size: 26px; font-weight: 700; color: var(--primary-garden); text-decoration: none; }
         .logo-text span { color: var(--dark-navy); }
         .nav-link { font-weight: 600; color: var(--dark-navy); margin: 0 10px; }
-        .nav-link:hover, .nav-link.active { color: var(--primary-garden) !important; }
         .search-box { max-width: 250px; }
         .search-box .form-control { font-size: 14px; border-radius: 50px 0 0 50px; }
         .search-box .btn { border-radius: 0 50px 50px 0; background-color: var(--primary-garden); color: #fff; border: none; }
@@ -36,7 +35,6 @@
         <div><i class="bi bi-telephone-fill me-2"></i>Hotline: <strong>0123 456 789</strong></div>
         <div class="d-flex gap-3">
             <a th:href="@{/admin/home}"><i class="bi bi-shield-lock-fill me-1"></i>Trang Quản Trị</a>
-            <a href="#"><i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập</a>
         </div>
     </div>
 </div>
@@ -51,7 +49,6 @@
             <ul class="navbar-nav ms-4 me-auto">
                 <li class="nav-item"><a class="nav-link" th:href="@{/home}">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/shop}">Cửa hàng</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/promotions}">Khuyến mãi</a></li>
             </ul>
             <form class="d-flex search-box me-4" th:action="@{/search}" method="GET">
                 <div class="input-group input-group-sm">
@@ -62,8 +59,7 @@
             <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
                 <a th:href="@{/shop/cart}" class="text-success position-relative">
                     <i class="bi bi-handbag-fill fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;" th:text="${totalItems ?: 0}">0</span>
-                </a>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;" th:text="${cartCount ?: 0}">0</span>                </a>
             </div>
         </div>
     </div>
@@ -97,26 +93,25 @@
                             <td>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="img-thumbnail-cart">
-                                        <img th:if="${item.product.image != null}" th:src="@{'/images/' + ${item.product.image}}" class="img-fluid w-100 h-100" style="object-fit: cover;">
-                                        <i th:unless="${item.product.image != null}" class="bi bi-camera text-muted fs-3"></i>
+                                        <i class="bi bi-box-seam text-muted fs-3"></i>
                                     </div>
                                     <div>
-                                        <a th:href="@{'/shop/products/' + ${item.product.id}}" class="fw-bold text-decoration-none text-dark d-block mb-1" th:text="${item.product.name}">Tên SP</a>
+                                        <a th:href="@{'/shop/products/' + ${item.productId}}" class="fw-bold text-decoration-none text-dark d-block mb-1" th:text="${item.productName}">Tên SP</a>
                                     </div>
                                 </div>
                             </td>
-                            <td class="fw-bold" th:text="${#numbers.formatDecimal(item.product.price != null ? item.product.price : 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
+                            <td class="fw-bold" th:text="${#numbers.formatDecimal(item.price != null ? item.price : 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
                             <td>
                                 <form th:action="@{/shop/cart/update}" method="POST" class="d-flex align-items-center gap-2">
-                                    <input type="hidden" name="productId" th:value="${item.product.id}">
+                                    <input type="hidden" name="productId" th:value="${item.productId}">
                                     <input type="number" class="form-control form-control-sm text-center rounded-pill" name="quantity" th:value="${item.quantity}" min="1" style="width: 70px;">
                                     <button type="submit" class="btn btn-sm btn-outline-success rounded-circle" title="Cập nhật"><i class="bi bi-check2"></i></button>
                                 </form>
                             </td>
-                            <td class="fw-bold text-success" th:text="${#numbers.formatDecimal(item.subTotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
+                            <td class="fw-bold text-success" th:text="${#numbers.formatDecimal(item.subtotal != null ? item.subtotal : 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
                             <td>
                                 <form th:action="@{/shop/cart/remove}" method="POST">
-                                    <input type="hidden" name="productId" th:value="${item.product.id}">
+                                    <input type="hidden" name="productId" th:value="${item.productId}">
                                     <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle"><i class="bi bi-trash3"></i></button>
                                 </form>
                             </td>
@@ -143,7 +138,11 @@
                     <span class="fw-bold fs-5">Tổng tiền:</span>
                     <span class="fw-bold fs-4 text-success" th:text="${#numbers.formatDecimal(totalAmount ?: 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
                 </div>
-                <a th:href="@{/checkout}" class="btn btn-garden w-100 shadow-sm" th:classappend="${cartItems == null or cartItems.empty} ? 'disabled' : ''">TIẾN HÀNH THANH TOÁN</a>
+                <a th:href="@{/checkout}"
+                   class="btn btn-garden w-100 shadow-sm text-center text-decoration-none d-block"
+                   th:classappend="${cartItems == null or cartItems.empty} ? 'disabled' : ''">
+                    TIẾN HÀNH THANH TOÁN
+                </a>
             </div>
         </div>
     </div>
