@@ -38,10 +38,14 @@
             </div>
 
             <div sec:authorize="isAuthenticated()" class="dropdown">
-                <a href="#" class="dropdown-toggle text-white text-decoration-none" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-1"></i> Chào,
-                    <span th:if="${#authentication.class.simpleName == 'OAuth2AuthenticationToken'}" th:text="${#authentication.principal.attributes['name']}">Google</span>
-                    <span th:unless="${#authentication.class.simpleName == 'OAuth2AuthenticationToken'}" th:text="${#strings.substringBefore(#authentication.name, '@')}">Local</span>
+                <a href="#" class="dropdown-toggle text-white text-decoration-none" data-bs-toggle="dropdown" style="display: flex; align-items: center;">
+                    <i class="bi bi-person-circle me-2"></i>
+                    Chào,&nbsp;
+                    <span th:if="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User)}"
+                          th:text="${#authentication.principal.attributes['name']}">Tên Google</span>
+
+                    <span th:unless="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User)}"
+                          th:text="${#strings.substringBefore(#authentication.name, '@')}">User Local</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                     <li><a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-person me-2"></i>Hồ sơ của tôi</a></li>
@@ -72,7 +76,7 @@
             <div sec:authorize="!isAuthenticated()" class="alert alert-info rounded-4 mb-4 d-flex align-items-center shadow-sm border-0" style="background-color: #e8f4fd;">
                 <i class="bi bi-info-circle-fill fs-3 me-3 text-primary"></i>
                 <div>
-                    <span class="d-block mb-1 text-dark">Bạn đang mua hàng với tư cách <strong>khách vãng lai</strong>.</span>
+                    <span class="d-block mb-1 text-dark">Bạn đang mua hàng với tư cách <strong>Tài khoản khách</strong>.</span>
                     <a th:href="@{/login}" class="fw-bold text-primary text-decoration-none">Đăng nhập</a> hoặc
                     <a th:href="@{/register}" class="fw-bold text-primary text-decoration-none">Đăng ký</a> để lưu lịch sử đơn hàng và tích điểm nhé!
                 </div>
