@@ -48,7 +48,13 @@
         .img-thumbnail-cart { width: 80px; height: 80px; object-fit: cover; border-radius: 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .btn-garden { background-color: var(--primary-garden); color: #fff; border-radius: 50px; border: none; font-weight: 700; padding: 12px; transition: 0.3s; }
         .btn-garden:hover { background-color: var(--dark-navy); color: #fff; }
-        footer { background-color: #1A1C20; color: #fff; padding: 60px 0 20px; border-radius: 50px 50px 0 0; margin-top: 60px; }
+        footer { background-color: #1A1C20; color: #fff; padding: 80px 0 40px; border-radius: 50px 50px 0 0; margin-top: 80px; }
+        .footer-title { font-weight: 700; margin-bottom: 20px; color: var(--primary-garden); text-transform: uppercase; font-size: 16px; }
+        .footer-link { color: #a0aabf; text-decoration: none; transition: 0.3s; display: block; margin-bottom: 10px; }
+        .footer-link:hover { color: #fff; padding-left: 5px; }
+        .social-icons i { font-size: 24px; margin-right: 15px; color: #a0aabf; transition: 0.3s; cursor: pointer; }
+        .social-icons i:hover { color: var(--primary-garden); }
+
     </style>
 </head>
 <body>
@@ -210,9 +216,39 @@
 </div>
 
 <footer>
-    <div class="container text-center">
-        <h5 class="fw-bold text-white mb-3"><a th:href="@{/home}" class="text-white text-decoration-none"><i class="bi bi-tree-fill"></i> KIDS GARDEN</a></h5>
-        <p class="text-white-50 small mb-0">© 2026 Kids Garden Fashion.</p>
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4 col-md-6">
+                <a class="logo-text text-white mb-4 d-block" style="font-size: 28px;" th:href="@{/home}"><i class="bi bi-tree-fill me-2" style="color: var(--primary-garden);"></i>KIDS<span style="color: #fff;">GARDEN</span></a>
+                <p class="text-white-50 lh-lg mb-4">Kids Garden không chỉ bán quần áo, chúng tôi cùng bạn nuôi dưỡng sự tự tin và nét hồn nhiên của bé thông qua những trang phục an toàn, thân thiện với môi trường.</p>
+                <div class="social-icons">
+                    <i class="bi bi-facebook"></i><i class="bi bi-instagram"></i><i class="bi bi-youtube"></i>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-title">Khám Phá</h5>
+                <a th:href="@{/shop}" class="footer-link">Sản phẩm mới</a>
+                <a th:href="@{/promotions}" class="footer-link">Khuyến mãi</a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-title">Hỗ Trợ Khách Hàng</h5>
+                <a href="#" class="footer-link">Hướng dẫn chọn size</a>
+                <a href="#" class="footer-link">Chính sách đổi trả</a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-title">Liên Hệ & Đăng Ký</h5>
+                <ul class="list-unstyled text-white-50 mb-4">
+                    <li class="mb-2"><i class="bi bi-geo-alt-fill me-2 text-white"></i> TP.HCM</li>
+                    <li class="mb-2"><i class="bi bi-telephone-fill me-2 text-white"></i> 0123 456 789</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="border-secondary mt-5 mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start text-white-50 small">
+                &copy; 2026 Kids Garden Fashion. Phát triển bởi Nhóm Đồ Án Java.
+            </div>
+        </div>
     </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.min.js"></script>
