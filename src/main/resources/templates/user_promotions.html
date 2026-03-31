@@ -51,10 +51,10 @@
                 <a href="#" class="dropdown-toggle text-white text-decoration-none" data-bs-toggle="dropdown" style="display: flex; align-items: center;">
                     <i class="bi bi-person-circle me-2"></i>
                     Chào,&nbsp;
-                    <span th:if="${#authentication.class.simpleName == 'OAuth2AuthenticationToken'}"
+                    <span th:if="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User)}"
                           th:text="${#authentication.principal.attributes['name']}">Tên Google</span>
 
-                    <span th:unless="${#authentication.class.simpleName == 'OAuth2AuthenticationToken'}"
+                    <span th:unless="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User)}"
                           th:text="${#strings.substringBefore(#authentication.name, '@')}">User Local</span>
                 </a>
 
