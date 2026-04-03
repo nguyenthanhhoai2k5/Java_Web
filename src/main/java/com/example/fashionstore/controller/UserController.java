@@ -37,6 +37,18 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder; // Thêm công cụ mã hóa mật khẩu
 
+    // =========================================================================
+    // HÀM HỖ TRỢ: Lấy chính xác Email từ Principal (Hỗ trợ cả Google và Local)
+    // =========================================================================
+    private String getEmailFromPrincipal(Principal principal) {
+        if (principal instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
+            org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken oauthToken =
+                    (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) principal;
+            return oauthToken.getPrincipal().getAttribute("email");
+        }
+        return principal.getName();
+    }
+
     // 1. Hiển thị trang Đăng nhập
     @GetMapping("/login")
     public String loginPage() {
@@ -53,7 +65,6 @@ public class UserController {
     // 3. Xử lý khi nhấn Submit Đăng ký
     @PostMapping("/register/process")
     public String processRegister(@ModelAttribute("user") User user, RedirectAttributes ra) {
-        // Kiểm tra xem email đã tồn tại trong Database chưa
         User existingUser = userService.findByEmail(user.getEmail());
 
         if (existingUser != null) {
@@ -61,58 +72,43 @@ public class UserController {
             return "redirect:/register";
         }
 
-        // Mã hóa mật khẩu trước khi lưu xuống Database
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // Thiết lập các thuộc tính mặc định
         user.setRole("ROLE_USER");
         user.setAuthProvider("LOCAL");
-
-        // Lưu vào cơ sở dữ liệu
         userService.save(user);
 
-        // Báo thành công và chuyển hướng về trang Đăng nhập
         ra.addFlashAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
         return "redirect:/login";
     }
 
+    // 4. Hiển thị Profile
     @GetMapping("/profile")
     public String userProfile(Model model, Principal principal) {
-        if (principal == null) return "redirect:/login"; // Chưa đăng nhập thì bắt đăng nhập
+        if (principal == null) return "redirect:/login";
 
-        String email = "";
+        String email = getEmailFromPrincipal(principal);
         String fullName = "";
 
-        // Kiểm tra xem khách đang đăng nhập bằng Google hay Local
         if (principal instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
-            // Nếu là Google: Ép kiểu để lấy thông tin thật
             org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken oauthToken =
                     (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) principal;
-            org.springframework.security.oauth2.core.user.OAuth2User oauth2User = oauthToken.getPrincipal();
-
-            email = oauth2User.getAttribute("email"); // Lấy Email thật
-            fullName = oauth2User.getAttribute("name"); // Lấy Tên thật trên Gmail
+            fullName = oauthToken.getPrincipal().getAttribute("name");
         } else {
-            // Nếu là Local (đăng nhập bằng form của mình)
-            email = principal.getName();
             fullName = email.split("@")[0];
         }
 
         User user = userService.findByEmail(email);
 
-        // Nếu lần đầu đăng nhập bằng Google chưa có trong DB thì tự động tạo
         if (user == null) {
             user = new User();
             user.setEmail(email);
             user.setFullName(fullName);
             user.setAuthProvider("GOOGLE");
             user.setRole("ROLE_USER");
-            userService.save(user); // Lưu vào DB
+            userService.save(user);
         }
 
-        // Lấy danh sách đơn hàng
         List<Order> myOrders = orderService.getOrdersByUser(user);
-
         model.addAttribute("user", user);
         model.addAttribute("myOrders", myOrders);
 
@@ -123,7 +119,7 @@ public class UserController {
     @PostMapping("/profile/update-info")
     public String updateProfileInfo(@ModelAttribute User userForm, Principal principal, RedirectAttributes ra) {
         try {
-            User existingUser = userService.findByEmail(principal.getName());
+            User existingUser = userService.findByEmail(getEmailFromPrincipal(principal));
 
             existingUser.setFullName(userForm.getFullName());
             existingUser.setPhone(userForm.getPhone());
@@ -137,11 +133,11 @@ public class UserController {
         return "redirect:/profile";
     }
 
-    // Xử lý Cập nhật riêng Avatar (Tránh lỗi MultipartException)
+    // Xử lý Cập nhật riêng Avatar
     @PostMapping("/profile/update-avatar")
     public String updateProfileAvatar(@RequestParam("avatarFile") MultipartFile avatarFile, Principal principal, RedirectAttributes ra) {
         try {
-            User existingUser = userService.findByEmail(principal.getName());
+            User existingUser = userService.findByEmail(getEmailFromPrincipal(principal));
 
             if (avatarFile != null && !avatarFile.isEmpty()) {
                 String fileName = "avatar_" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
@@ -168,7 +164,6 @@ public class UserController {
     // 7. Xử lý gửi mail mật khẩu mới
     @PostMapping("/forgot-password/process")
     public String processForgotPassword(@RequestParam("email") String email, RedirectAttributes ra) {
-        // Kiểm tra xem email có tồn tại trong hệ thống không
         User user = userService.findByEmail(email);
 
         if (user == null) {
@@ -176,15 +171,11 @@ public class UserController {
             return "redirect:/forgot-password";
         }
 
-        // Tạo mật khẩu mới ngẫu nhiên (6 ký tự)
         String newPassword = UUID.randomUUID().toString().substring(0, 6);
-
-        // Mã hóa mật khẩu mới trước khi lưu vào DB
         user.setPassword(passwordEncoder.encode(newPassword));
         userService.save(user);
 
         try {
-            // Gửi email
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(user.getEmail());
             message.setSubject("Khôi phục mật khẩu - Kids Garden");
@@ -211,27 +202,23 @@ public class UserController {
                                  Principal principal,
                                  RedirectAttributes ra) {
         try {
-            User user = userService.findByEmail(principal.getName());
+            User user = userService.findByEmail(getEmailFromPrincipal(principal));
 
-            // 1. Kiểm tra tài khoản đăng nhập bằng Google (loại này không có pass để đổi)
             if (user.getPassword() == null || user.getPassword().isEmpty()) {
                 ra.addFlashAttribute("error", "Tài khoản đăng nhập bằng Google không cần đổi mật khẩu tại đây!");
                 return "redirect:/profile";
             }
 
-            // 2. Kiểm tra mật khẩu cũ xem có khớp với trong DB không
             if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
                 ra.addFlashAttribute("error", "Mật khẩu hiện tại không đúng!");
                 return "redirect:/profile";
             }
 
-            // 3. Kiểm tra mật khẩu mới và ô xác nhận có giống nhau không
             if (!newPassword.equals(confirmPassword)) {
                 ra.addFlashAttribute("error", "Mật khẩu xác nhận không khớp!");
                 return "redirect:/profile";
             }
 
-            // 4. Mã hóa mật khẩu mới và lưu xuống DB
             user.setPassword(passwordEncoder.encode(newPassword));
             userService.save(user);
 
@@ -241,5 +228,30 @@ public class UserController {
         }
 
         return "redirect:/profile";
+    }
+
+    // Xem chi tiết đơn hàng
+    @GetMapping("/profile/order-detail/{id}")
+    public String orderDetail(@PathVariable("id") Long id, Model model, Principal principal, RedirectAttributes ra) {
+        if (principal == null) return "redirect:/login";
+
+        // Sử dụng hàm hỗ trợ đã khai báo bên trên
+        String email = getEmailFromPrincipal(principal);
+        User currentUser = userService.findByEmail(email);
+
+        Order order = orderService.findById(id);
+
+        if (order == null || order.getUser() == null || !order.getUser().getId().equals(currentUser.getId())) {
+            ra.addFlashAttribute("error", "Không tìm thấy đơn hàng hoặc bạn không có quyền xem!");
+            return "redirect:/profile#orders";
+        }
+
+        // BỔ SUNG: Gọi Service để lấy chính xác danh sách các món đồ trong đơn hàng này
+        List<com.example.fashionstore.model.OrderDetail> orderDetails = orderService.getOrderDetails(id);
+
+        model.addAttribute("order", order);
+        model.addAttribute("orderDetails", orderDetails); // Gửi danh sách ra ngoài HTML
+
+        return "user_order_detail";
     }
 }
