@@ -106,4 +106,9 @@ public class OrderService {
         if (user == null) return new java.util.ArrayList<>();
         return orderRepository.findByUserOrderByOrderDateDesc(user);
     }
+
+    // Hàm tìm đơn hàng theo ID
+    public Order findById(Long id) {
+        return orderRepository.findById(id).orElse(null);
+    }
 }
