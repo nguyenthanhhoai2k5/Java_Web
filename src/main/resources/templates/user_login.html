@@ -20,7 +20,7 @@
     </div>
 
     <div th:if="${param.error}" class="alert alert-danger rounded-pill text-center small">Sai email hoặc mật khẩu!</div>
-
+    <div th:if="${message}" class="alert alert-success rounded-pill text-center small fw-bold" th:text="${message}"></div>
     <form th:action="@{/login}" method="POST">
         <div class="mb-3">
             <input type="email" name="username" class="form-control rounded-pill px-4 py-2" placeholder="Email của bạn" required>
