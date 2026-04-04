@@ -4,6 +4,7 @@ import com.example.fashionstore.model.CartItem;
 import com.example.fashionstore.model.Coupon;
 import com.example.fashionstore.model.Order;
 import com.example.fashionstore.model.User;
+import com.example.fashionstore.service.CouponService;
 import com.example.fashionstore.service.OrderService;
 import com.example.fashionstore.service.ShopCartService;
 import com.example.fashionstore.service.UserService;
@@ -11,10 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -28,26 +26,40 @@ public class CheckoutController {
     private ShopCartService shopCartService;
 
     @Autowired
+    private CouponService couponService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private UserService userService; // Đã thêm UserService để gọi DB
-
-    @Autowired
-    private com.example.fashionstore.service.CouponService couponService; // Thêm CouponService
+    // =========================================================================
+    // HÀM HỖ TRỢ: Lấy chính xác Email từ Principal (Hỗ trợ cả Google và Local)
+    // =========================================================================
+    private String getEmailFromPrincipal(Principal principal) {
+        if (principal == null) return null;
+        if (principal instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
+            org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken oauthToken =
+                    (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) principal;
+            return oauthToken.getPrincipal().getAttribute("email");
+        }
+        return principal.getName();
+    }
 
     // 1. HIỂN THỊ TRANG THANH TOÁN
     @GetMapping("/checkout")
     public String showCheckoutPage(Model model, HttpSession session, RedirectAttributes ra, Principal principal) {
         List<CartItem> cartItems = new ArrayList<>(shopCartService.getCartItems(session));
         if (cartItems.isEmpty()) {
+            ra.addFlashAttribute("message", "Giỏ hàng của bạn đang trống!");
             return "redirect:/shop/cart";
         }
 
         List<Coupon> activeCoupons = couponService.getActiveCoupons();
         model.addAttribute("activeCoupons", activeCoupons);
 
-        // TỰ ĐỘNG ÁP DỤNG: Nếu Session hoàn toàn rỗng (lần đầu vào) -> Tự lấy mã đầu tiên
+        // TỰ ĐỘNG ÁP DỤNG MÃ
         if (session.getAttribute("appliedCode") == null && !activeCoupons.isEmpty()) {
             Coupon bestCoupon = activeCoupons.get(0);
             session.setAttribute("appliedCode", bestCoupon.getCode());
@@ -81,14 +93,7 @@ public class CheckoutController {
 
         Order order = new Order();
         if (principal != null) {
-            // Lấy email đúng cho cả Google và Local
-            String email = principal.getName();
-            if (principal instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
-                org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken oauthToken =
-                        (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) principal;
-                email = oauthToken.getPrincipal().getAttribute("email");
-            }
-
+            String email = getEmailFromPrincipal(principal); // Dùng hàm hỗ trợ ở đây
             User user = userService.findByEmail(email);
             if (user != null) {
                 order.setCustomerName(user.getFullName());
@@ -101,10 +106,9 @@ public class CheckoutController {
         return "user_checkout";
     }
 
-    // 2. XỬ LÝ KHI KHÁCH ĐỔI MÃ GIẢM GIÁ
+    // 2. XỬ LÝ ÁP DỤNG MÃ GIẢM GIÁ
     @PostMapping("/checkout/apply-coupon")
     public String applyCoupon(@RequestParam(value = "code", defaultValue = "NONE") String code, HttpSession session, RedirectAttributes ra) {
-        // Khách chủ động chọn "Không dùng mã" -> Lưu chữ "NONE"
         if ("NONE".equals(code) || code.isEmpty()) {
             session.setAttribute("appliedCode", "NONE");
             session.removeAttribute("discountValue");
@@ -135,7 +139,6 @@ public class CheckoutController {
         Double discountValue = (Double) session.getAttribute("discountValue");
         String discountType = (String) session.getAttribute("discountType");
 
-        // CHỈ TRỪ TIỀN NẾU MÃ KHÁC "NONE"
         if (appliedCode != null && !"NONE".equals(appliedCode) && discountValue != null) {
             Double discountAmount = 0.0;
             if ("percent".equals(discountType)) {
@@ -149,13 +152,7 @@ public class CheckoutController {
 
         if (!cartItems.isEmpty()) {
             if (principal != null) {
-                // Sửa lỗi lấy Email để lưu đúng User
-                String email = principal.getName();
-                if (principal instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
-                    org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken oauthToken =
-                            (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) principal;
-                    email = oauthToken.getPrincipal().getAttribute("email");
-                }
+                String email = getEmailFromPrincipal(principal); // Dùng hàm hỗ trợ ở đây
                 User user = userService.findByEmail(email);
                 order.setUser(user);
             } else {
@@ -165,7 +162,7 @@ public class CheckoutController {
             Order savedOrder = orderService.placeOrder(order, cartItems, finalAmount);
             session.setAttribute("lastOrderCode", savedOrder.getOrderCode());
 
-            // Dọn dẹp Session
+            // Dọn dẹp Session sau khi đặt hàng thành công
             session.removeAttribute("cart");
             session.removeAttribute("appliedCode");
             session.removeAttribute("discountValue");
@@ -174,9 +171,13 @@ public class CheckoutController {
         return "redirect:/checkout/success";
     }
 
+    // 4. TRANG HIỂN THỊ ĐẶT HÀNG THÀNH CÔNG
     @GetMapping("/checkout/success")
-    public String checkoutSuccess(Model model, HttpSession session) {
+    public String checkoutSuccess(HttpSession session, Model model) {
         String orderCode = (String) session.getAttribute("lastOrderCode");
+        if (orderCode == null) {
+            return "redirect:/home";
+        }
         model.addAttribute("orderCode", orderCode);
         return "user_checkout_success";
     }
