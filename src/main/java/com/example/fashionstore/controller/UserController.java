@@ -171,12 +171,14 @@ public class UserController {
             return "redirect:/forgot-password";
         }
 
+        // 1. Tạo mật khẩu mới ngẫu nhiên (chưa lưu vào DB vội)
         String newPassword = UUID.randomUUID().toString().substring(0, 6);
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userService.save(user);
 
         try {
+            // 2. TIẾN HÀNH GỬI EMAIL TRƯỚC
             SimpleMailMessage message = new SimpleMailMessage();
+            // BẮT BUỘC PHẢI CÓ DÒNG NÀY ĐỂ GMAIL KHÔNG TỪ CHỐI
+            message.setFrom("banhbaobeo2205@gmail.com");
             message.setTo(user.getEmail());
             message.setSubject("Khôi phục mật khẩu - Kids Garden");
             message.setText("Chào " + user.getFullName() + ",\n\n"
@@ -185,13 +187,20 @@ public class UserController {
                     + "Trân trọng,\nKids Garden Team.");
 
             mailSender.send(message);
+
+            // 3. NẾU GỬI MAIL THÀNH CÔNG KHÔNG BỊ LỖI -> MỚI LƯU VÀO DATABASE
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userService.save(user);
+
             ra.addFlashAttribute("message", "Mật khẩu mới đã được gửi đến email của bạn!");
+            return "redirect:/login";
+
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "Có lỗi xảy ra khi gửi email. Vui lòng kiểm tra lại thiết lập Email.");
+            // 4. NẾU GỬI MAIL THẤT BẠI -> BÁO LỖI VÀ BẢO TOÀN MẬT KHẨU CŨ
+            System.out.println("Lỗi gửi mail: " + e.getMessage()); // In lỗi ra màn hình console để dễ debug
+            ra.addFlashAttribute("error", "Có lỗi xảy ra khi gửi email. Vui lòng kiểm tra lại kết nối mạng hoặc thiết lập Email.");
             return "redirect:/forgot-password";
         }
-
-        return "redirect:/login";
     }
 
     // Xử lý Đổi mật khẩu trong Profile
