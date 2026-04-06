@@ -1,40 +1,156 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
 <section>
-    <div class="container mt-4" style="max-width: 95%;">
-        <h1 class="mb-4 text-primary"><i class="bi bi-graph-up-arrow me-2"></i>Báo Cáo Thống Kê</h1>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="card p-4 border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
-                    <h6 class="text-uppercase mb-2 opacity-75">Doanh thu tháng này</h6>
-                    <h2 class="fw-bold mb-0" th:text="${currentMonthSales != null ? currentMonthSales : '0đ'}">0đ</h2>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-4 border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #2F80ED, #56CCF2);">
-                    <h6 class="text-uppercase mb-2 opacity-75">Đơn hàng tháng này</h6>
-                    <h2 class="fw-bold mb-0" th:text="${currentMonthOrders != null ? currentMonthOrders : 0}">0</h2>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-4 border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #FF416C, #FF4B2B);">
-                    <h6 class="text-uppercase mb-2 opacity-75">Sản phẩm bán chạy nhất</h6>
-                    <h5 class="fw-bold mb-0" th:text="${bestSellingProduct != null ? bestSellingProduct : 'Chưa có dữ liệu'}">Tên SP</h5>
-                </div>
-            </div>
-        </div>
+    <div style="background-color: #edf7e9; padding: 20px 30px; min-height: 100vh; width: 100%; box-sizing: border-box;">
+        <div style="max-width: 95%; margin: 0 auto;">
+            
+            <h1 style="font-weight: 700; color: #1f4f2b; border-left: 6px solid #4caf50; padding-left: 18px; margin-bottom: 1.8rem; font-size: 1.85rem;">
+                <i class="fas fa-chart-pie me-2" style="color: #4caf50;"></i> Báo Cáo Thống Kê
+            </h1>
 
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="card shadow border-0 p-4">
-                    <h5 class="fw-bold text-secondary mb-4">Biểu đồ tổng quan (Cần tích hợp Chart.js)</h5>
-                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 300px; border: 2px dashed #ccc;">
-                        <span class="text-muted"><i class="bi bi-bar-chart-line fs-1 d-block text-center"></i> Khu vực hiển thị biểu đồ</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 20px; padding: 25px; color: white; box-shadow: 0 10px 20px rgba(17, 153, 142, 0.2); transition: transform 0.3s;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h6 style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; opacity: 0.9; margin-bottom: 10px;">Doanh thu tháng này</h6>
+                            <h2 style="font-weight: 700; margin: 0; font-size: 2rem;" th:text="${currentMonthSales != null ? currentMonthSales : '0đ'}">0đ</h2>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #2F80ED 0%, #56CCF2 100%); border-radius: 20px; padding: 25px; color: white; box-shadow: 0 10px 20px rgba(47, 128, 237, 0.2); transition: transform 0.3s;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h6 style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; opacity: 0.9; margin-bottom: 10px;">Đơn hàng tháng này</h6>
+                            <h2 style="font-weight: 700; margin: 0; font-size: 2rem;" th:text="${currentMonthOrders != null ? currentMonthOrders : '0'}">0</h2>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); border-radius: 20px; padding: 25px; color: white; box-shadow: 0 10px 20px rgba(255, 65, 108, 0.2); transition: transform 0.3s;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h6 style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; opacity: 0.9; margin-bottom: 10px;">Sản phẩm bán chạy nhất</h6>
+                            <h4 style="font-weight: 700; margin: 0; font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;" th:text="${bestSellingProduct != null ? bestSellingProduct : 'Chưa có dữ liệu'}">Tên SP</h4>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+                            <i class="fas fa-fire"></i>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                
+                <div style="flex: 2; min-width: 400px; background: white; border-radius: 24px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid #eaf5e6;">
+                    <h5 style="font-weight: 700; color: #2c5e2e; margin-bottom: 20px;"><i class="fas fa-chart-bar me-2"></i> Tổng quan doanh thu (6 tháng gần nhất)</h5>
+                    <div style="height: 350px; width: 100%;">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 300px; background: white; border-radius: 24px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid #eaf5e6;">
+                    <h5 style="font-weight: 700; color: #2c5e2e; margin-bottom: 20px;"><i class="fas fa-chart-pie me-2"></i> Tỉ lệ trạng thái đơn hàng</h5>
+                    <div style="height: 300px; width: 100%; display: flex; justify-content: center;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+
+<script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // =========================================================
+            // 1. BIỂU ĐỒ DOANH THU (CỘT) 
+            // =========================================================
+            // Lấy thẳng đối tượng Map từ Java (Có sẵn thuộc tính labels và values)
+            const monthlyData = /*[[${monthlyChart}]]*/ {labels: [], values: []}; 
+            
+            const revenueLabels = monthlyData.labels; // Không cần dùng map() nữa vì Backend đã tách sẵn
+            const revenueValues = monthlyData.values;
+
+            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            let gradientGreen = ctxRevenue.createLinearGradient(0, 0, 0, 400);
+            gradientGreen.addColorStop(0, 'rgba(76, 175, 80, 0.8)');   
+            gradientGreen.addColorStop(1, 'rgba(76, 175, 80, 0.2)');
+
+            new Chart(ctxRevenue, {
+                type: 'bar',
+                data: {
+                    labels: revenueLabels, 
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: revenueValues,   
+                        backgroundColor: gradientGreen,
+                        borderColor: '#4caf50',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#f0f0f0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // =========================================================
+            // 2. BIỂU ĐỒ TRẠNG THÁI ĐƠN (TRÒN)
+            // =========================================================
+            const statusData = /*[[${statusChart}]]*/ {labels: [], values: []};
+            
+            const statusLabels = statusData.labels;
+            const statusValues = statusData.values;
+
+            // Phân bổ màu sắc dựa trên Label Backend trả về
+            const dynamicColors = statusLabels.map(label => {
+                if (label === 'Đã giao hàng' || label === 'Đã giao') return '#28a745'; // Xanh lá
+                if (label === 'Đang xử lý') return '#ffc107'; // Vàng
+                if (label === 'Đã hủy') return '#dc3545'; // Đỏ
+                return '#17a2b8'; // Màu dự phòng
+            });
+
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels, 
+                    datasets: [{
+                        data: statusValues,   
+                        backgroundColor: dynamicColors, 
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, font: { family: "'Segoe UI', sans-serif", size: 13 } }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </section>
 </html>
