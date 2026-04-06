@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,61 +8,286 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-garden: #72B01D; --dark-navy: #22577A; --light-garden: #F0F7EE; }
-        body { font-family: 'Quicksand', sans-serif; color: var(--dark-navy); background-color: #f8f9fa; }
-        .top-bar { background-color: var(--dark-navy); color: #fff; font-size: 13px; padding: 6px 0; }
-        .top-bar a { color: #fff; text-decoration: none; transition: 0.3s; }
-        .top-bar a:hover { color: var(--primary-garden); }
-        .navbar { background-color: #fff; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
-        .logo-text { font-size: 26px; font-weight: 700; color: var(--primary-garden); text-decoration: none; }
-        .logo-text span { color: var(--dark-navy); }
-        .nav-link { font-weight: 600; color: var(--dark-navy); margin: 0 10px; }
-        .nav-link:hover, .nav-link.active { color: var(--primary-garden) !important; }
-        .search-box { max-width: 250px; }
-        .search-box .form-control { font-size: 14px; border-radius: 50px 0 0 50px; }
-        .search-box .btn { border-radius: 0 50px 50px 0; background-color: var(--primary-garden); color: #fff; border: none; }
+        :root {
+            --primary-garden: #72B01D;
+            --dark-navy: #22577A;
+            --light-garden: #F0F7EE;
+        }
 
-        .cat-item { padding: 12px 15px; border-radius: 15px; transition: 0.3s; color: var(--dark-navy); text-decoration: none; display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 5px; }
-        .cat-item:hover, .cat-item.active { background: var(--primary-garden); color: #fff !important; }
-        .product-card { border: none; border-radius: 25px; border: 1px solid #f1f1f1; transition: 0.3s; background: #fff; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .img-box { aspect-ratio: 1/1; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-radius: 25px 25px 0 0; overflow: hidden;}
-        footer { background-color: #1A1C20; color: #fff; padding: 60px 0 20px; border-radius: 50px 50px 0 0; margin-top: 60px; }
-        .footer-title { font-weight: 700; margin-bottom: 20px; color: var(--primary-garden); text-transform: uppercase; font-size: 16px; }
-        .footer-link { color: #a0aabf; text-decoration: none; transition: 0.3s; display: block; margin-bottom: 10px; }
-        .footer-link:hover { color: #fff; padding-left: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            color: var(--dark-navy);
+            background-color: #f8f9fa;
+        }
+
+        .top-bar {
+            background-color: var(--dark-navy);
+            color: #fff;
+            font-size: 13px;
+            padding: 6px 0;
+            position: relative;
+            z-index: 1050;
+        }
+
+        .top-bar a {
+            color: #fff;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .top-bar a:hover {
+            color: var(--primary-garden);
+        }
+
+        .top-bar .dropdown-menu .dropdown-item {
+            color: var(--dark-navy) !important;
+            font-weight: 600;
+        }
+
+        .top-bar .dropdown-menu .dropdown-item:hover {
+            color: var(--primary-garden) !important;
+            background-color: #f8f9fa;
+        }
+
+        .top-bar .dropdown-menu .dropdown-item.text-danger {
+            color: #dc3545 !important;
+        }
+
+        .top-bar .dropdown-menu .dropdown-item.text-danger:hover {
+            color: #fff !important;
+            background-color: #dc3545;
+        }
+
+        .navbar {
+            background-color: #fff;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo-text {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary-garden);
+            text-decoration: none;
+        }
+
+        .logo-text span {
+            color: var(--dark-navy);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: var(--dark-navy);
+            margin: 0 10px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-garden) !important;
+        }
+
+        .search-box {
+            max-width: 250px;
+        }
+
+        .search-box .form-control {
+            font-size: 14px;
+            border-radius: 50px 0 0 50px;
+        }
+
+        .search-box .btn {
+            border-radius: 0 50px 50px 0;
+            background-color: var(--primary-garden);
+            color: #fff;
+            border: none;
+        }
+
+        .cat-item {
+            padding: 12px 15px;
+            border-radius: 15px;
+            transition: 0.3s;
+            color: var(--dark-navy);
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .cat-item:hover, .cat-item.active {
+            background: var(--primary-garden);
+            color: #fff !important;
+        }
+
+        .product-card {
+            border: none;
+            border-radius: 25px;
+            border: 1px solid #f1f1f1;
+            transition: 0.3s;
+            background: #fff;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .img-box {
+            aspect-ratio: 1/1;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px 25px 0 0;
+            overflow: hidden;
+        }
+
+        footer {
+            background-color: #1A1C20;
+            color: #fff;
+            padding: 80px 0 40px;
+            border-radius: 50px 50px 0 0;
+            margin-top: 80px;
+        }
+
+        .footer-title {
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-garden);
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+
+        .footer-link {
+            color: #a0aabf;
+            text-decoration: none;
+            transition: 0.3s;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .footer-link:hover {
+            color: #fff;
+            padding-left: 5px;
+        }
+
+        .social-icons i {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #a0aabf;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .social-icons i:hover {
+            color: var(--primary-garden);
+        }
+
+        .pagination {
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-garden);
+            border-color: var(--primary-garden);
+        }
+
+        .page-link {
+            color: var(--dark-navy);
+        }
     </style>
 </head>
 <body>
 
+<!-- Top Bar -->
 <div class="top-bar">
     <div class="container d-flex justify-content-between align-items-center">
-        <div><i class="bi bi-telephone-fill me-2"></i>Hotline: <strong>0123 456 789</strong></div>
-        <div class="d-flex gap-3">
-            <a th:href="@{/admin/home}"><i class="bi bi-shield-lock-fill me-1"></i>Trang Quản Trị</a>
-            <a href="#"><i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập</a>
+        <div>
+            <i class="bi bi-telephone-fill me-2"></i>Hotline: <strong>0123 456 789</strong>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <!-- Chưa đăng nhập -->
+            <div sec:authorize="!isAuthenticated()">
+                <a th:href="@{/login}" class="me-3">
+                    <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
+                </a>
+                <a th:href="@{/register}">
+                    <i class="bi bi-person-plus me-1"></i>Đăng ký
+                </a>
+            </div>
+
+            <!-- Đã đăng nhập -->
+            <div sec:authorize="isAuthenticated()" class="dropdown">
+                <a href="#" class="dropdown-toggle text-white text-decoration-none" data-bs-toggle="dropdown" style="display: flex; align-items: center;">
+                    <i class="bi bi-person-circle me-2"></i> Chào,&nbsp;
+                    <span th:if="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User)}"
+                          th:text="${#authentication.principal.attributes['name']}">Tên Google</span>
+                    <span th:unless="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User)}"
+                          th:text="${#strings.substringBefore(#authentication.name, '@')}">User Local</span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="margin-top: 10px;">
+                    <li>
+                        <a class="dropdown-item py-2" th:href="@{/profile}">
+                            <i class="bi bi-person me-2"></i>Hồ sơ của tôi
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" th:href="@{/profile#orders}">
+                            <i class="bi bi-bag-check me-2"></i>Đơn hàng của tôi
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                            <button type="submit" class="dropdown-item text-danger py-2 border-0 bg-transparent" style="width: 100%; text-align: left;">
+                                <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
     <div class="container">
-        <a class="logo-text" th:href="@{/home}"><i class="bi bi-tree-fill me-2"></i>KIDS<span>GARDEN</span></a>
+        <a class="logo-text" th:href="@{/home}">
+            <i class="bi bi-tree-fill me-2"></i>KIDS<span>GARDEN</span>
+        </a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
             <i class="bi bi-list fs-1 text-dark"></i>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-4 me-auto">
-                <li class="nav-item"><a class="nav-link" th:href="@{/home}">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link active" th:href="@{/shop}">Cửa hàng</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/promotions}">Khuyến mãi</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/home}">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/shop}">Cửa hàng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/promotions}">Khuyến mãi</a>
+                </li>
             </ul>
+
             <form class="d-flex search-box me-4" th:action="@{/search}" method="GET">
                 <div class="input-group input-group-sm">
                     <input type="text" name="keyword" th:value="${keyword}" class="form-control border-end-0 shadow-none" placeholder="Tìm sản phẩm...">
-                    <button class="btn px-3" type="submit"><i class="bi bi-search"></i></button>
+                    <button class="btn px-3" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </div>
             </form>
+
             <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
                 <a th:href="@{/shop/cart}" class="text-dark position-relative">
                     <i class="bi bi-handbag fs-5"></i>
@@ -73,58 +298,156 @@
     </div>
 </nav>
 
+<!-- Main Content -->
 <div class="container my-5">
     <div class="row g-4">
+        <!-- Sidebar - Categories -->
         <div class="col-lg-3">
             <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
                 <h5 class="fw-bold mb-4">Loại Quần Áo</h5>
                 <div class="d-flex flex-column">
                     <a th:href="@{/shop}" class="cat-item" th:classappend="${param.categoryId == null} ? 'active' : ''">
                         <span>Tất cả</span>
+                        <i class="bi bi-arrow-right-short"></i>
                     </a>
                     <a th:each="cat : ${categories}"
                        th:href="@{'/shop'(categoryId=${cat.id})}"
                        class="cat-item"
                        th:classappend="${param.categoryId != null and param.categoryId[0] == cat.id.toString()} ? 'active' : ''">
                         <span th:text="${cat.name}">Tên Loại</span>
+                        <i class="bi bi-arrow-right-short"></i>
                     </a>
                 </div>
             </div>
         </div>
 
+        <!-- Products Grid -->
         <div class="col-lg-9">
-            <h4 class="fw-bold mb-4" th:if="${keyword != null}">Kết quả tìm kiếm cho: '<span th:text="${keyword}"></span>'</h4>
+            <div th:if="${keyword != null}" class="mb-4">
+                <h4 class="fw-bold">Kết quả tìm kiếm cho: '<span th:text="${keyword}" class="text-primary"></span>'</h4>
+            </div>
 
             <div class="row g-3">
-                <div th:if="${products == null or products.empty}" class="col-12 text-center py-5">
-                    <h5 class="text-muted">Không tìm thấy sản phẩm nào!</h5>
+                <!-- No products found -->
+                <div th:if="${products == null or products.size() == 0}" class="col-12 text-center py-5">
+                    <i class="bi bi-emoji-frown fs-1 text-muted"></i>
+                    <h5 class="text-muted mt-3">Không tìm thấy sản phẩm nào!</h5>
+                    <a th:href="@{/shop}" class="btn btn-outline-success mt-3">Xem tất cả sản phẩm</a>
                 </div>
 
+                <!-- Product items -->
                 <div class="col-6 col-md-4" th:each="product : ${products}">
                     <div class="product-card">
                         <a th:href="@{'/shop/products/' + ${product.id}}" class="text-decoration-none text-dark">
                             <div class="img-box">
-                                <img th:if="${product.image != null}" th:src="@{'/images/' + ${product.image}}" alt="Img" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                <img th:if="${product.image != null}"
+                                     th:src="@{'/images/' + ${product.image}}"
+                                     th:alt="${product.name}"
+                                     class="img-fluid w-100 h-100"
+                                     style="object-fit: cover;">
                                 <i th:unless="${product.image != null}" class="bi bi-camera text-muted fs-3"></i>
                             </div>
                             <div class="p-3 text-center">
                                 <h6 class="fw-bold text-truncate" th:text="${product.name}">Tên SP</h6>
-                                <p class="text-success fw-bold" th:text="${#numbers.formatDecimal(product.price != null ? product.price : 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</p>
+                                <p class="text-success fw-bold mb-0">
+                                    <span th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')}">0</span>đ
+                                </p>
+                                <small class="text-muted" th:if="${product.quantity != null and product.quantity > 0}">
+                                    Còn <span th:text="${product.quantity}">0</span> sản phẩm
+                                </small>
+                                <small class="text-danger" th:unless="${product.quantity != null and product.quantity > 0}">
+                                    Hết hàng
+                                </small>
                             </div>
                         </a>
                     </div>
                 </div>
             </div>
+
+            <!-- Pagination -->
+            <div th:if="${totalPages != null and totalPages > 1}" class="pagination">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/shop(p=${currentPage - 1}, categoryId=${param.categoryId}, keyword=${param.keyword})}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(1, totalPages)}"
+                            class="page-item"
+                            th:classappend="${currentPage == i} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/shop(p=${i}, categoryId=${param.categoryId}, keyword=${param.keyword})}"
+                               th:text="${i}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/shop(p=${currentPage + 1}, categoryId=${param.categoryId}, keyword=${param.keyword})}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Footer -->
 <footer>
-    <div class="container text-center">
-        <h5 class="fw-bold text-white mb-3"><i class="bi bi-tree-fill"></i> KIDS GARDEN</h5>
-        <p class="text-white-50 small mb-0">© 2026 Kids Garden Fashion. Ươm mầm phong cách Việt.</p>
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4 col-md-6">
+                <a class="logo-text text-white mb-4 d-block" style="font-size: 28px;" th:href="@{/home}">
+                    <i class="bi bi-tree-fill me-2" style="color: var(--primary-garden);"></i>KIDS<span style="color: #fff;">GARDEN</span>
+                </a>
+                <p class="text-white-50 lh-lg mb-4">
+                    Kids Garden không chỉ bán quần áo, chúng tôi cùng bạn nuôi dưỡng sự tự tin và nét hồn nhiên của bé thông qua những trang phục an toàn, thân thiện với môi trường.
+                </p>
+                <div class="social-icons">
+                    <i class="bi bi-facebook"></i>
+                    <i class="bi bi-instagram"></i>
+                    <i class="bi bi-youtube"></i>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-title">Khám Phá</h5>
+                <a th:href="@{/shop}" class="footer-link">Sản phẩm mới</a>
+                <a th:href="@{/promotions}" class="footer-link">Khuyến mãi</a>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-title">Hỗ Trợ Khách Hàng</h5>
+                <a href="#" class="footer-link">Hướng dẫn chọn size</a>
+                <a href="#" class="footer-link">Chính sách đổi trả</a>
+                <a href="#" class="footer-link">Chính sách vận chuyển</a>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 class="footer-title">Liên Hệ & Đăng Ký</h5>
+                <ul class="list-unstyled text-white-50 mb-4">
+                    <li class="mb-2">
+                        <i class="bi bi-geo-alt-fill me-2 text-white"></i> TP. Hồ Chí Minh
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-telephone-fill me-2 text-white"></i> 0123 456 789
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-envelope-fill me-2 text-white"></i> kidsgarden@gmail.com
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="border-secondary mt-5 mb-4">
+
+        <div class="row align-items-center">
+            <div class="col-md-12 text-center text-white-50 small">
+                &copy; 2026 Kids Garden Fashion. Phát triển bởi Nhóm Đồ Án Java.
+            </div>
+        </div>
     </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

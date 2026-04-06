@@ -5,48 +5,211 @@
     <title>Fashion Store - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { display: flex; min-height: 100vh; overflow-x: hidden; }
-        /* Sidebar chiếm 20% */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #f5f5f5;
+        }
+
+        /* Sidebar chiếm 15% - màu nền #01837f */
         .sidebar {
             width: 15%;
-            background-color: #212529;
+            background-color: #01837f;
             color: white;
-            padding: 20px 0;
             position: fixed;
-            height: 100%;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
-        /* Content chiếm 80% */
+
+        /* Logo / Brand */
+        .sidebar-brand {
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 15px;
+        }
+
+        .sidebar-brand h4 {
+            color: white;
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        /* Menu items */
+        .sidebar-menu {
+            padding: 0;
+        }
+
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: #ffc107;
+            padding-left: 25px;
+        }
+
+        .sidebar .active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left-color: #ffc107;
+            font-weight: 600;
+        }
+
+        /* Divider */
+        .sidebar-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 15px 20px;
+        }
+
+        /* Logout button */
+        .logout-link {
+            margin-top: 20px;
+            color: #ff6b6b !important;
+        }
+
+        .logout-link:hover {
+            background-color: rgba(255, 107, 107, 0.2) !important;
+            color: #ff8888 !important;
+        }
+
+        /* Content chiếm 85% - đẩy sang phải */
         .content {
             width: 85%;
-            margin-left: 20%; /* Đẩy sang phải để không bị sidebar đè lên */
+            margin-left: 15%;
             padding: 20px;
+            min-height: 100vh;
+            background-color: #edf7e9;
         }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 12px 20px;
-            transition: 0.3s;
+
+        /* Scrollbar tùy chỉnh cho sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
         }
-        .sidebar a:hover { background-color: #343a40; }
-        .sidebar .active { background-color: #0d6efd; }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        /* Responsive cho màn hình nhỏ */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-brand h4 {
+                font-size: 0.8rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar a span:not(.icon-only) {
+                display: none;
+            }
+
+            .sidebar a {
+                justify-content: center;
+                padding: 12px 0;
+            }
+
+            .content {
+                width: calc(100% - 70px);
+                margin-left: 70px;
+            }
+        }
+
+        /* Animation cho content khi load */
+        .content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
 
+<!-- Sidebar Menu - màu #01837f, chiếm 15% -->
 <div class="sidebar">
-    <h4 class="text-center mb-4">Fashion Admin</h4>
-    <hr>
-    <a th:href="@{/admin/home}" th:classappend="${page == 'home'} ? 'active' : ''">🏠 Trang chủ</a>
-    <a th:href="@{/admin/category}" th:classappend="${page == 'category'} ? 'active' : ''">📂 Quản lý danh mục</a>
-    <a th:href="@{/admin/coupons}" th:classappend="${page == 'coupons' ? 'active' : ''}">🎟️ Quản lý mã giảm giá</a>
-    <a th:href="@{/admin/customer}" th:classappend="${page == 'customer'} ? 'active' : ''">👥 Quản lý người mua</a>
-    <a th:href="@{/admin/order}" th:classappend="${page == 'order'} ? 'active' : ''">📦 Quản lý đơn hàng</a>
-    <a th:href="@{/admin/statistics}" th:classappend="${page == 'statistics'} ? 'active' : ''">📊 Thống kê</a>
-    <hr>
-    <a href="/logout" class="text-danger">Đăng xuất</a>
+    <div class="sidebar-brand">
+        <h4>👗 Fashion Admin</h4>
+    </div>
+
+    <div class="sidebar-menu">
+        <a th:href="@{/admin/home}" th:classappend="${page == 'home'} ? 'active' : ''">
+            <span>🏠</span>
+            <span class="menu-text">Trang chủ</span>
+        </a>
+        <a th:href="@{/admin/category}" th:classappend="${page == 'category'} ? 'active' : ''">
+            <span>📂</span>
+            <span class="menu-text">Quản lý danh mục</span>
+        </a>
+        <a th:href="@{/admin/coupons}" th:classappend="${page == 'coupons'} ? 'active' : ''">
+            <span>🎟️</span>
+            <span class="menu-text">Quản lý mã giảm giá</span>
+        </a>
+        <a th:href="@{/admin/customer}" th:classappend="${page == 'customer'} ? 'active' : ''">
+            <span>👥</span>
+            <span class="menu-text">Quản lý người mua</span>
+        </a>
+        <a th:href="@{/admin/order}" th:classappend="${page == 'order'} ? 'active' : ''">
+            <span>📦</span>
+            <span class="menu-text">Quản lý đơn hàng</span>
+        </a>
+        <a th:href="@{/admin/statistics}" th:classappend="${page == 'statistics'} ? 'active' : ''">
+            <span>📊</span>
+            <span class="menu-text">Thống kê</span>
+        </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-menu">
+        <a href="/logout" class="logout-link">
+            <span>🚪</span>
+            <span class="menu-text">Đăng xuất</span>
+        </a>
+    </div>
 </div>
 
+<!-- Nội dung chính - chiếm 85% còn lại -->
 <div class="content">
     <div th:insert="~{ :: section}"></div>
 </div>

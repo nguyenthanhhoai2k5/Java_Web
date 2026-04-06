@@ -26,8 +26,8 @@ public class ShopCartController {
         model.addAttribute("totalAmount", shopCartService.getTotalAmount(session));
         model.addAttribute("totalItems", shopCartService.getTotalItems(session));
 
-        // Đã sửa dòng này để trỏ đúng vào file user_cart.html trong thư mục templates
-        return "user_cart";
+        // SỬA Ở ĐÂY - Vì file nằm trong thư mục shop/
+        return "shop/cart";
     }
 
     @PostMapping("/add")

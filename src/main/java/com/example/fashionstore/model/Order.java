@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.example.fashionstore.model.User;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,11 +31,9 @@ public class Order {
 
     // Trạng thái: "Đang xử lý", "Đã giao hàng", "Đã hủy"
     private String status;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true) // nullable = true cho phép khách vãng lai
+    private User user;
     @Column(name = "order_date")
     private LocalDateTime orderDate = LocalDateTime.now();
-
-    @ManyToOne
-    @JoinColumn(name = "user_id") // Tên cột khóa ngoại trong bảng orders ở database
-    private User user; // Biến này PHẢI tên là "user" để khớp với mappedBy bên lớp User
 }

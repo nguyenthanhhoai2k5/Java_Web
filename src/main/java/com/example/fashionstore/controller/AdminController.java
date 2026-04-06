@@ -1,10 +1,10 @@
 package com.example.fashionstore.controller;
 
 import com.example.fashionstore.model.*;
-import com.example.fashionstore.repository.CouponRepository;
-import com.example.fashionstore.repository.UserRepository;
 import com.example.fashionstore.service.*;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Set;
 
 @Controller
-@RequestMapping("/admin") // Các đường dẫn sẽ bắt đầu bằng /admin
+@RequestMapping("/admin")
 public class AdminController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private CategoryService categoryService;
@@ -37,10 +39,6 @@ public class AdminController {
     private CouponService couponService;
 
     @Autowired
-    private CouponRepository couponRepository; // Giữ lại vì một số logic trước đó của bạn đang dùng trực tiếp
-
-    // Tích hợp Service mới cho chức năng 4 và 5
-    @Autowired
     private OrderService orderService;
 
     @Autowired
@@ -49,17 +47,13 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
     // ==============================================================
     // TRANG CHỦ ADMIN (DASHBOARD)
     // ==============================================================
     @GetMapping({"/", "/home"})
     public String adminHome(Model model) {
-        model.addAttribute("page", "home"); // Để active nút Trang chủ trên menu
+        model.addAttribute("page", "home");
 
-        // Cập nhật thống kê thực tế cho Dashboard từ StatisticsService
         model.addAttribute("totalOrders", statisticsService.getCurrentMonthOrderCount());
         model.addAttribute("totalSales", statisticsService.getCurrentMonthSalesFormatted());
         model.addAttribute("totalProducts", productService.getAll().size());
@@ -73,7 +67,7 @@ public class AdminController {
     @GetMapping("/category")
     public String manageCategory(Model model,
                                  @RequestParam(value = "keyword", required = false) String keyword,
-                                 @RequestParam(value = "p", defaultValue = "1") int pageNum){
+                                 @RequestParam(value = "p", defaultValue = "1") int pageNum) {
         model.addAttribute("categories", categoryService.getAll());
         model.addAttribute("category", new Category());
 
@@ -122,15 +116,17 @@ public class AdminController {
                               RedirectAttributes ra) {
         try {
             if (imageFile != null && !imageFile.isEmpty()) {
-                String fileName = imageFile.getOriginalFilename();
+                String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
                 Path path = Paths.get("src/main/resources/static/images/" + fileName);
+                Files.createDirectories(path.getParent());
                 Files.copy(imageFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                 product.setImage(fileName);
             }
             productService.save(product);
             ra.addFlashAttribute("message", "Dữ liệu sản phẩm đã được cập nhật!");
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
+            logger.error("Lỗi khi lưu sản phẩm: ", e);
+            ra.addFlashAttribute("error", "Lỗi khi lưu sản phẩm: " + e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -152,10 +148,12 @@ public class AdminController {
         Product product = productService.getById(id);
         if (product != null) {
             try {
-                Path path = Paths.get("src/main/resources/static/images/" + product.getImage());
-                Files.deleteIfExists(path);
+                if (product.getImage() != null && !product.getImage().isEmpty()) {
+                    Path path = Paths.get("src/main/resources/static/images/" + product.getImage());
+                    Files.deleteIfExists(path);
+                }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Lỗi khi xóa ảnh sản phẩm: ", e);
             }
             productService.delete(id);
             ra.addFlashAttribute("message", "Đã xóa sản phẩm thành công!");
@@ -205,7 +203,7 @@ public class AdminController {
             couponService.save(coupon);
             ra.addFlashAttribute("message", "Lưu mã giảm giá thành công!");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi lưu mã giảm giá: ", e);
             ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
             return "redirect:/admin/coupons/add";
         }
@@ -214,7 +212,8 @@ public class AdminController {
 
     @GetMapping("/coupons/edit/{id}")
     public String editCoupon(@PathVariable("id") Long id, Model model) {
-        Coupon coupon = couponRepository.findById(id).orElse(null);
+        // ✅ ĐÚNG - Dùng getById để lấy coupon theo ID
+        Coupon coupon = couponService.getById(id);  // Cần thêm method này trong CouponService
         model.addAttribute("coupon", coupon);
         model.addAttribute("categories", categoryService.getAll());
         model.addAttribute("page", "coupons");
@@ -227,14 +226,15 @@ public class AdminController {
             couponService.delete(id);
             ra.addFlashAttribute("message", "Đã xóa mã giảm giá thành công!");
         } catch (Exception e) {
+            logger.error("Lỗi khi xóa mã giảm giá: ", e);
             ra.addFlashAttribute("error", "Không thể xóa mã giảm giá này: " + e.getMessage());
         }
         return "redirect:/admin/coupons";
     }
 
-    //==============================================================
+    // ==============================================================
     // CHỨC NĂNG 3: QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG
-    //==============================================================
+    // ==============================================================
     @GetMapping("/customer")
     public String listUsers(@RequestParam(name = "keyword", required = false) String keyword,
                             Model model) {
@@ -249,11 +249,9 @@ public class AdminController {
         model.addAttribute("users", users);
         model.addAttribute("keyword", keyword);
 
-        // SỬA Ở ĐÂY: Phải khớp hoàn toàn với tên file admin_user_list.html
         return "admin_user_list";
     }
 
-    // Tiện tay viết luôn hàm xử lý Update Role cho cái Script fetch của bạn
     @PostMapping("/admin/update-role")
     @ResponseBody
     public ResponseEntity<String> updateRole(@RequestParam Long id, @RequestParam String role) {
@@ -265,7 +263,7 @@ public class AdminController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
-    // xóa tài khoản
+
     @GetMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         User user = userService.getById(id);
@@ -275,30 +273,30 @@ public class AdminController {
             return "redirect:/admin/customer";
         }
 
-        // 1. Kiểm tra nếu là ADMIN
         if ("ADMIN".equals(user.getRole())) {
             redirectAttributes.addFlashAttribute("errorMessage", "Tài khoản Admin không thể xóa!");
             return "redirect:/admin/customer";
         }
 
-        // 2. Kiểm tra nếu User đã có đơn hàng (Cần tiêm OrderRepository hoặc OrderService vào)
-        // Giả sử trong User model bạn có List<Order> orders
         if (user.getOrders() != null && !user.getOrders().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Người dùng này đã có đơn hàng, không thể xóa để tránh mất dữ liệu lịch sử!");
             return "redirect:/admin/customer";
         }
 
-        // 3. Nếu thỏa mãn điều kiện thì tiến hành xóa
         try {
             userService.delete(id);
             redirectAttributes.addFlashAttribute("successMessage", "Đã xóa người dùng thành công!");
         } catch (Exception e) {
+            logger.error("Lỗi khi xóa người dùng: ", e);
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
         }
 
         return "redirect:/admin/customer";
     }
-    // Xem lịch sử mua hàng
+
+    // ==============================================================
+    // Xem lịch sử mua hàng - ĐÃ SỬA LỖI
+    // ==============================================================
     @GetMapping("/users/history/{id}")
     public String viewUserHistory(@PathVariable Long id,
                                   @RequestParam(name = "keyword", required = false) String keyword,
@@ -308,16 +306,16 @@ public class AdminController {
             return "redirect:/admin/customer";
         }
 
-        // Lấy danh sách chi tiết mua hàng
-        List<OrderDetail> history = orderService.getHistoryByUserId(id);
+        // ✅ SỬA: Gọi đúng method với tham số Long (userId)
+        List<Order> history = orderService.getOrdersByUserId(user.getId());
 
         model.addAttribute("user", user);
         model.addAttribute("history", history);
-        model.addAttribute("keyword", keyword); // Để giữ lại giá trị trong ô search
+        model.addAttribute("keyword", keyword);  // ✅ ĐÃ SỬA: keyword đã được khai báo
 
-        // Trả về tên file HTML (giả sử bạn đặt tên là admin_user_history.html)
         return "admin_user_history";
     }
+
     // ==============================================================
     // CHỨC NĂNG 4: QUẢN LÝ ĐƠN HÀNG
     // ==============================================================
@@ -349,6 +347,7 @@ public class AdminController {
             orderService.updateStatus(orderId, status);
             ra.addFlashAttribute("message", "Đã cập nhật trạng thái đơn hàng thành công!");
         } catch (Exception e) {
+            logger.error("Lỗi cập nhật trạng thái đơn hàng: ", e);
             ra.addFlashAttribute("error", "Lỗi cập nhật: " + e.getMessage());
         }
         return "redirect:/admin/order";
@@ -373,10 +372,14 @@ public class AdminController {
     public String showStatistics(Model model) {
         model.addAttribute("page", "statistics");
 
-        // Gọi Service để lấy dữ liệu thống kê đẩy ra View
         model.addAttribute("currentMonthSales", statisticsService.getCurrentMonthSalesFormatted());
         model.addAttribute("currentMonthOrders", statisticsService.getCurrentMonthOrderCount());
         model.addAttribute("bestSellingProduct", statisticsService.getBestSellingProduct());
+
+        model.addAttribute("statusChart", statisticsService.getOrderStatusData());
+        model.addAttribute("topProductsChart", statisticsService.getTopProductsData());
+        model.addAttribute("categoryChart", statisticsService.getCategoryRevenueData());
+        model.addAttribute("monthlyChart", statisticsService.getMonthlyRevenueData());
 
         return "admin_statistics";
     }

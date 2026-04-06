@@ -1,11 +1,14 @@
 package com.example.fashionstore.service;
 
-import com.example.fashionstore.model.Order;
-import com.example.fashionstore.model.OrderDetail;
+import com.example.fashionstore.model.*;
 import com.example.fashionstore.repository.OrderDetailRepository;
 import com.example.fashionstore.repository.OrderRepository;
+import com.example.fashionstore.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -16,6 +19,9 @@ public class OrderService {
 
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private ProductRepository productRepository; // Bổ sung cái này
 
     // Lấy tất cả đơn hàng
     public List<Order> getAllOrders() {
@@ -49,9 +55,59 @@ public class OrderService {
         return orderDetailRepository.findByOrderId(orderId);
     }
 
-    // Lấy lịch sử mua hàng chi tiết của 1 người dùng
-    public List<OrderDetail> getHistoryByUserId(Long userId) {
-        return orderDetailRepository.findByOrderId(userId);
+    @Transactional
+    public Order placeOrder(Order order, List<CartItem> cartItems, Double totalAmount) {
+        // 1. Sinh mã đơn hàng ngẫu nhiên và thiết lập thông tin cơ bản
+        order.setOrderCode("OD" + System.currentTimeMillis());
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus("Đang xử lý");
+        order.setTotalAmount(totalAmount);
+
+        // 2. Lưu Order vào bảng orders để lấy ID
+        Order savedOrder = orderRepository.save(order);
+
+        // 3. Duyệt qua giỏ hàng để lưu chi tiết và trừ kho
+        for (CartItem item : cartItems) {
+            OrderDetail detail = new OrderDetail();
+            detail.setOrder(savedOrder);
+
+            // Tìm Product thật trong DB
+            Product product = productRepository.findById(item.getProductId()).orElse(null);
+            if (product != null) {
+                detail.setProduct(product);
+
+                // === BẮT ĐẦU CẬP NHẬT KHO ===
+                // Trừ số lượng trong kho
+                int newQuantity = product.getQuantity() - item.getQuantity();
+                product.setQuantity(Math.max(newQuantity, 0)); // Đảm bảo kho không bị số âm
+
+                // Tăng số lượng đã bán (phục vụ chức năng Bán chạy nhất)
+                int currentSold = product.getSoldQuantity() != null ? product.getSoldQuantity() : 0;
+                product.setSoldQuantity(currentSold + item.getQuantity());
+
+                // Lưu cập nhật sản phẩm vào database
+                productRepository.save(product);
+                // === KẾT THÚC CẬP NHẬT KHO ===
+            }
+
+            detail.setQuantity(item.getQuantity());
+            detail.setPrice(item.getPrice());
+            // Sử dụng getSubtotal() từ class CartItem của bạn
+            detail.setSubTotal(item.getSubtotal());
+
+            orderDetailRepository.save(detail);
+        }
+
+        return savedOrder;
     }
 
+    // Lấy lịch sử mua hàng của khách hàng
+    public List<Order> getOrdersByUserId(Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
+    // Hàm tìm đơn hàng theo ID
+    public Order findById(Long id) {
+        return orderRepository.findById(id).orElse(null);
+    }
 }

@@ -1,0 +1,270 @@
+/* ----- GLOBAL & BODY (background #edf7e9) ----- */
+body {
+    background-color: #edf7e9 !important;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/* Override container-fluid to be centered, 80% width, with soft rounded corners */
+.custom-admin-container {
+    width: 80%;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+/* Tab navigation styling - modern & green accent */
+.nav-tabs {
+    border-bottom: 2px solid #e0f0dc;
+    background-color: #fefef7;
+    padding-left: 1.5rem;
+    padding-top: 0.75rem;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    font-weight: 600;
+    color: #2c6e2f;
+    padding: 0.75rem 1.8rem;
+    margin-right: 0.5rem;
+    border-radius: 30px 30px 0 0;
+    transition: all 0.25s;
+    background-color: transparent;
+    font-size: 1rem;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #1e7e34;
+    background-color: rgba(76, 175, 80, 0.08);
+    border-bottom: 3px solid #4caf50;
+}
+
+.nav-tabs .nav-link.active {
+    color: #ffffff;
+    background-color: #4caf50;
+    border-bottom: 3px solid #2c6e2f;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.02);
+}
+
+/* tab content panel */
+.tab-content {
+    background: white;
+    border-radius: 0 0 15px 15px;
+    padding: 2rem 2rem 2rem 2rem !important;
+}
+
+/* headings with green touches */
+h1, h4 {
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+h1 {
+    color: #1f4f2b;
+    border-left: 6px solid #4caf50;
+    padding-left: 18px;
+    margin-bottom: 1.5rem !important;
+    font-size: 1.85rem;
+}
+
+h4.text-secondary {
+    color: #2b5e2f !important;
+    font-weight: 600;
+    border-bottom: 2px dashed #c8e6c0;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+/* table styling - rounded corners, soft hover */
+.table {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.table thead th {
+    background-color: #eaf5e6;
+    color: #1f4f2b;
+    font-weight: 700;
+    border-bottom: 2px solid #cde2c5;
+    font-size: 0.9rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f3fcef;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+/* category list row clickable style */
+tbody tr[onclick] {
+    transition: background 0.15s;
+}
+
+/* form styling */
+.form-label {
+    font-weight: 600;
+    color: #2c5e2e;
+    margin-bottom: 6px;
+}
+
+.form-control, .input-group .form-control {
+    border-radius: 12px;
+    border: 1px solid #cfe3ca;
+    padding: 10px 14px;
+    transition: 0.2s;
+}
+
+.form-control:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+/* buttons: primary, danger, secondary with rounded corners */
+.btn {
+    border-radius: 40px;
+    padding: 8px 22px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    box-shadow: 0 2px 6px rgba(76,175,80,0.3);
+}
+
+.btn-primary:hover {
+    background-color: #3e9b41;
+    border-color: #3e8e41;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-radius: 40px;
+}
+
+.btn-success {
+    background-color: #4caf50;
+    border-radius: 40px;
+    border: none;
+    padding: 8px 24px;
+}
+
+.btn-outline-secondary {
+    border-radius: 40px;
+    border-color: #bddcb5;
+    color: #2d6a2f;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+}
+
+.btn-info {
+    background-color: #3f9e4b;
+    border-color: #3f9e4b;
+    border-radius: 30px;
+    padding: 5px 14px;
+}
+
+/* badge styling */
+.badge.bg-success {
+    background-color: #4caf50 !important;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-weight: 500;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #2d4a1e;
+    border-radius: 30px;
+    padding: 6px 12px;
+}
+
+/* thumbnail image */
+.img-thumbnail {
+    border-radius: 16px;
+    border: 1px solid #dee2cf;
+    padding: 4px;
+    background: #fff;
+    transition: transform 0.2s;
+}
+
+.img-thumbnail:hover {
+    transform: scale(1.02);
+}
+
+/* Pagination with green accent */
+.pagination .page-link {
+    color: #2c6e2f;
+    border-radius: 30px;
+    margin: 0 4px;
+    border: 1px solid #cde2c5;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+    box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+}
+
+.pagination .page-link:hover {
+    background-color: #e2f3df;
+    color: #1f5a23;
+}
+
+/* adjust responsive for smaller screens */
+@media (max-width: 992px) {
+    .custom-admin-container {
+        width: 92%;
+        margin: 1rem auto;
+    }
+    .tab-content {
+        padding: 1.5rem !important;
+    }
+    .col-md-6.border-end {
+        border-right: 0 !important;
+        margin-bottom: 2rem;
+    }
+    .row {
+        flex-direction: column;
+    }
+}
+
+/* Extra card-like shadow for forms & tables */
+.border-end {
+    border-right-color: #e2efdd !important;
+}
+
+button, a {
+    transition: all 0.2s ease;
+}
+
+/* floating action and cleaner spacing */
+.d-flex.gap-2 {
+    gap: 0.8rem;
+}
+
+.btn-secondary {
+    background-color: #bdd9b4;
+    border-color: #b0cfaa;
+    color: #244d23;
+}
+
+.btn-secondary:hover {
+    background-color: #a1c598;
+    color: #1c3a1b;
+}
+
+/* custom id display field */
+input#catDisplayId {
+    background-color: #f3f9ef;
+}

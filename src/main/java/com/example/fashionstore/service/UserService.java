@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Transactional
 public class UserService {
 
     @Autowired
@@ -19,9 +20,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // Tìm kiếm người dùng theo từ khóa
+    // Tìm kiếm người dùng theo từ khóa (tìm theo tên hoặc email)
     public List<User> searchByName(String keyword) {
-        return userRepository.findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCase(keyword, keyword);
+        // Sửa lại: tìm theo fullName hoặc email
+        return userRepository.findByFullNameContainingIgnoreCase(keyword);
     }
 
     // Lấy thông tin 1 người dùng theo ID
@@ -30,11 +32,11 @@ public class UserService {
     }
 
     // Lưu hoặc cập nhật người dùng
+    @Transactional
     public void save(User user) {
         userRepository.save(user);
     }
 
-    // UserService.java
     @Transactional
     public void delete(Long id) {
         if (userRepository.existsById(id)) {
@@ -42,5 +44,9 @@ public class UserService {
         } else {
             throw new RuntimeException("Không tìm thấy người dùng để xóa!");
         }
+    }
+    // Tìm email
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

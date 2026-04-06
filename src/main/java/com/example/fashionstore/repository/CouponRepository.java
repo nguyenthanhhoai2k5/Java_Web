@@ -11,4 +11,7 @@ import java.util.List;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     // Tự động có các hàm lưu, xóa, sửa, tìm kiếm
     List<Coupon> findByCodeContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String code, String description);
+
+    // Tìm mã theo tên code chính xác
+    Coupon findByCode(String code);
 }
