@@ -110,8 +110,7 @@
     <div class="sidebar-divider"></div>
 
     <div class="sidebar-menu">
-        <form th:action="@{/logout}" method="post" id="logoutForm" style="display: none;"></form>
-        <a href="javascript:void(0)" onclick="document.getElementById('logoutForm').submit();" style="color: #ff9e9e;">
+            <form th:action="@{/admin/logout}" method="post" id="logoutForm" style="display: none;"></form>        <a href="javascript:void(0)" onclick="document.getElementById('logoutForm').submit();" style="color: #ff9e9e;">
             <span>🚪</span><span class="menu-text">Đăng xuất</span>
         </a>
     </div>
