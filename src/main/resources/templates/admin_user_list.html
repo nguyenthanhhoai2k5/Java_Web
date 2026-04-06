@@ -62,11 +62,10 @@
                   <span style="font-weight: 600; color: #2c3e2d;" th:text="${user.username}">username</span>
                 </div>
               </td>
-              <td style="padding: 1rem; vertical-align: middle;">
-                <select class="form-select form-select-sm" th:onchange="'updateRole(' + ${user.id} + ', this.value)'" style="padding: 6px 12px; border-radius: 20px; border: 1px solid #cfe3ca; background-color: white; font-size: 0.875rem; cursor: pointer; width: 120px;">
-                  <option value="ADMIN" th:selected="${user.role == 'ADMIN'}" style="color: #dc3545;">👑 Admin</option>
-                  <option value="USER" th:selected="${user.role == 'USER'}" style="color: #4caf50;">👤 User</option>
-                </select>
+              <td>
+                <span th:class="${user.role == '👑 ADMIN' ? 'badge bg-danger' : 'badge bg-primary'}"
+                      th:text="${user.role}">👤 ROLE
+                </span>
               </td>
               <td style="padding: 1rem; vertical-align: middle; text-align: center;">
                 <a th:href="@{'/admin/users/history/' + ${user.id}}" style="border-radius: 30px; padding: 6px 16px; font-weight: 500; transition: all 0.2s; color: white; background-color: #17a2b8; border: 1px solid #17a2b8; text-decoration: none; display: inline-block; margin-right: 0.5rem;">
@@ -243,41 +242,18 @@
   </style>
 
   <script>
-    function updateRole(userId, newRole) {
+    function changeRole(userId, newRole) {
       fetch(`/admin/users/update-role?id=${userId}&role=${newRole}`, {
-        method: 'POST'
-      }).then(response => {
-        if(response.ok) {
-          // Tạo alert thành công tạm thời
-          const alertDiv = document.createElement('div');
-          alertDiv.className = 'alert alert-success alert-dismissible fade show';
-          alertDiv.setAttribute('role', 'alert');
-          alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; animation: slideInRight 0.3s ease-out; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border: none; border-radius: 16px; box-shadow: 0 8px 20px rgba(76, 175, 80, 0.15); padding: 1rem 1.5rem;';
-          alertDiv.innerHTML = '<span style="color: #155724; font-weight: 500;">✅ Cập nhật quyền thành công!</span><button type="button" class="btn-close" data-bs-dismiss="alert" style="float: right; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #155724;"></button>';
-          document.body.appendChild(alertDiv);
-
-          // Tự động xóa alert sau 3 giây
-          setTimeout(() => {
-            alertDiv.remove();
-          }, 3000);
-        } else {
-          // Tạo alert lỗi tạm thời
-          const alertDiv = document.createElement('div');
-          alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-          alertDiv.setAttribute('role', 'alert');
-          alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; animation: slideInRight 0.3s ease-out; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border: none; border-radius: 16px; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.15); padding: 1rem 1.5rem;';
-          alertDiv.innerHTML = '<span style="color: #721c24; font-weight: 500;">❌ Lỗi khi cập nhật quyền!</span><button type="button" class="btn-close" data-bs-dismiss="alert" style="float: right; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #721c24;"></button>';
-          document.body.appendChild(alertDiv);
-
-          // Tự động xóa alert sau 3 giây
-          setTimeout(() => {
-            alertDiv.remove();
-          }, 3000);
-        }
-      }).catch(error => {
-        console.error('Error:', error);
-        alert('❌ Lỗi kết nối khi cập nhật quyền!');
-      });
+        method: 'POST',
+      })
+        .then(response => {
+          if (response.ok) {
+            // Hiển thị thông báo thành công (bạn đã có logic alert trong file rồi)
+            showSuccessAlert("Đã cập nhật quyền thành " + newRole);
+          } else {
+            showErrorAlert("Lỗi khi cập nhật!");
+          }
+        });
     }
   </script>
 </section>

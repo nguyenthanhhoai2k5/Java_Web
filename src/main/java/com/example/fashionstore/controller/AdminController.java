@@ -257,16 +257,20 @@ public class AdminController {
         return "admin_user_list";
     }
 
-    @PostMapping("/admin/update-role")
-    @ResponseBody
-    public ResponseEntity<String> updateRole(@RequestParam Long id, @RequestParam String role) {
-        User user = userService.getById(id);
-        if (user != null) {
-            user.setRole(role);
-            userService.save(user);
-            return ResponseEntity.ok("Success");
+    @PostMapping("/users/update-role")
+    @ResponseBody // Dùng Ajax để cập nhật nhanh không cần load lại trang
+    public ResponseEntity<?> updateUserRole(@RequestParam Long id, @RequestParam String role) {
+        try {
+            User user = userService.getById(id);
+            if (user != null) {
+                user.setRole(role);
+                userService.save(user); // Lưu xuống DB
+                return ResponseEntity.ok("Cập nhật thành công");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy người dùng");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
     @GetMapping("/users/delete/{id}")
