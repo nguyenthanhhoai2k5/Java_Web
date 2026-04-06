@@ -2,13 +2,18 @@ package com.example.fashionstore.controller;
 
 import com.example.fashionstore.model.*;
 import com.example.fashionstore.service.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -383,4 +388,11 @@ public class AdminController {
 
         return "admin_statistics";
     }
+
+    // Đăng nhập
+    @GetMapping("/login")
+    public String login() {
+        return "user_login"; // Trả về file user_login.html
+    }
+
 }

@@ -1,70 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
 <section>
-  <div class="container mt-4" style="max-width: 95%;">
-    <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-      <span th:text="${message}"></span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-
-    <h1 class="mb-4 text-primary"><i class="bi bi-cart-check me-2"></i>Quản Lý Đơn Hàng</h1>
-
-    <div class="d-flex justify-content-between mb-4">
-      <form th:action="@{/admin/order}" method="get" class="input-group" style="max-width: 450px;">
-        <input type="text" name="keyword" th:value="${keyword}" class="form-control" placeholder="Tìm theo Mã đơn, SĐT khách...">
-        <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> Tìm kiếm</button>
-        <a th:if="${keyword}" th:href="@{/admin/order}" class="btn btn-outline-danger"><i class="bi bi-x-lg"></i></a>
-      </form>
-
-      <div class="card bg-light px-4 py-2 border-primary border-start border-4">
-        <span class="text-muted small">Tổng số đơn hàng</span>
-        <h4 class="mb-0 fw-bold text-primary" th:text="${totalOrders != null ? totalOrders : 0}">0</h4>
+  <div style="background-color: #edf7e9; padding: 20px 30px; min-height: 100vh;">
+    <div style="max-width: 90%; margin: 0 auto;">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h1 style="font-weight: 700; color: #1f4f2b; border-left: 6px solid #4caf50; padding-left: 18px;">
+           Quản lý đơn hàng
+        </h1>
+        <!-- Form tìm kiếm -->
+        <form method="get" style="display: flex; gap: 10px;">
+          <input type="text" name="keyword" class="form-control"
+                 placeholder="Mã đơn hàng / Tên khách hàng..."
+                 th:value="${keyword}" style="border-radius: 40px; padding: 8px 20px;">
+          <button type="submit" style="border-radius: 40px; padding: 8px 24px; background: #4caf50; color: white; border: none;">Tìm</button>
+        </form>
       </div>
-    </div>
 
-    <div class="card shadow">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-dark">
+      <!-- Bảng danh sách đơn hàng -->
+      <div style="background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.08);">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead style="background: linear-gradient(135deg, #eaf5e6 0%, #4caf50 100%);">
           <tr>
-            <th>Mã Đơn</th>
-            <th>Khách Hàng</th>
-            <th>Ngày Đặt</th>
-            <th>Tổng Tiền</th>
-            <th>Trạng Thái</th>
-            <th>Thao Tác</th>
+            <th style="padding: 15px; text-align: left;">Mã đơn hàng</th>
+            <th style="padding: 15px; text-align: left;">Khách hàng</th>
+            <th style="padding: 15px; text-align: left;">Ngày đặt</th>
+            <th style="padding: 15px; text-align: right;">Tổng tiền</th>
+            <th style="padding: 15px; text-align: center;">Trạng thái</th>
+            <th style="padding: 15px; text-align: center;">Thao tác</th>
           </tr>
           </thead>
           <tbody>
           <tr th:if="${#lists.isEmpty(orders)}">
-            <td colspan="6" class="text-center py-4 fw-bold text-muted">Chưa có đơn hàng nào!</td>
+            <td colspan="6" style="text-align: center; padding: 40px;">Không có đơn hàng nào</td>
           </tr>
-
-          <tr th:each="order : ${orders}">
-            <td><a th:href="@{'/admin/order/detail/' + ${order.id}}" class="fw-bold text-decoration-none" th:text="${order.orderCode}">OD001</a></td>
-            <td>
-              <div class="fw-bold" th:text="${order.customerName}">Nguyễn Văn A</div>
-              <small class="text-muted" th:text="${order.phone}">0901234567</small>
+          <tr th:each="o : ${orders}" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 15px;" th:text="${o.orderCode}">OD001</td>
+            <td style="padding: 15px;" th:text="${o.customerName}">Khách A</td>
+            <td style="padding: 15px;" th:text="${#temporals.format(o.orderDate, 'dd/MM/yyyy HH:mm')}">-</td>
+            <td style="padding: 15px; text-align: right; font-weight: bold; color: #4caf50;"
+                th:text="${#numbers.formatDecimal(o.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
+            <td style="padding: 15px; text-align: center;">
+              <span th:if="${o.status == 'Đang xử lý'}" style="background: #fff3cd; color: #856404; padding: 4px 12px; border-radius: 20px;">⚡ Đang xử lý</span>
+              <span th:if="${o.status == 'Đã giao hàng'}" style="background: #d4edda; color: #155724; padding: 4px 12px; border-radius: 20px;">✅ Đã giao</span>
+              <span th:if="${o.status == 'Đã hủy'}" style="background: #f8d7da; color: #721c24; padding: 4px 12px; border-radius: 20px;">❌ Đã hủy</span>
             </td>
-            <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">12/05/2026</td>
-            <td class="fw-bold text-success" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
-            <td>
-              <form th:action="@{/admin/order/update-status}" method="POST" class="d-flex align-items-center">
-                <input type="hidden" name="orderId" th:value="${order.id}">
-                <select name="status" class="form-select form-select-sm" style="max-width: 140px;">
-                  <option value="Đang xử lý" th:selected="${order.status == 'Đang xử lý'}">Đang xử lý</option>
-                  <option value="Đã giao hàng" th:selected="${order.status == 'Đã giao hàng'}">Đã giao</option>
-                  <option value="Đã hủy" th:selected="${order.status == 'Đã hủy'}">Đã hủy</option>
-                </select>
-                <button type="submit" class="btn btn-sm btn-success ms-1" title="Cập nhật"><i class="bi bi-check2"></i></button>
-              </form>
-            </td>
-            <td>
-              <a th:href="@{'/admin/order/detail/' + ${order.id}}" class="btn btn-sm btn-outline-dark"><i class="bi bi-eye"></i> Xem</a>
+            <td style="padding: 15px; text-align: center;">
+              <a th:href="@{/admin/orders/detail/{id}(id=${o.id})}"
+                 style="background: #4caf50; color: white; padding: 5px 15px; border-radius: 20px; text-decoration: none;">Chi tiết</a>
             </td>
           </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Form cập nhật trạng thái (nếu cần) -->
+      <div style="margin-top: 20px; text-align: right;">
+        <span>Tổng số đơn hàng: <strong th:text="${#lists.size(orders)}">0</strong></span>
       </div>
     </div>
   </div>

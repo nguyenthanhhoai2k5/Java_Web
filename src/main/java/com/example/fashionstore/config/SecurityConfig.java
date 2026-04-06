@@ -15,6 +15,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable()) // Tạm thời disable để test logout POST dễ dàng hơn
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/home", "/login", "/register", "/register/process", "/forgot-password",
                                 "/shop/**", "/product/**", "/css/**", "/js/**", "/images/**",
@@ -32,13 +33,15 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutUrl("/logout")               // Phải khớp với th:action trong form
+                        .logoutSuccessUrl("/login?logout")  // Về trang login kèm tham số logout
+                        .invalidateHttpSession(true)        // Xóa Session
+                        .deleteCookies("JSESSIONID")        // Xóa Cookie
                         .permitAll()
                 );
         return http.build();
     }
-    // ✅ CHỈ MỘT BEAN PasswordEncoder DUY NHẤT
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

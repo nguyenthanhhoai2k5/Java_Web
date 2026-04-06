@@ -1,117 +1,290 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
 <section>
-    <div class="container mt-4" style="max-width: 80%;">
-        <div class="mb-3">
-            <a th:href="@{/admin/coupons}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-arrow-left"></i> ← Trở về danh sách
-            </a>
-        </div>
+    <div style="background-color: #edf7e9; padding: 20px 30px; min-height: 100vh; width: 100%; box-sizing: border-box;">
+        <div style="max-width: 85%; margin: 0 auto;">
 
-        <div class="card shadow border-0">
-            <div class="card-header bg-white py-3">
-                <h1 class="h3 mb-0 text-primary"
-                    th:text="${coupon.id != null ? 'Sửa mã giảm giá' : 'Thêm mã giảm giá'}"></h1>
+            <!-- Nút trở về -->
+            <div style="margin-bottom: 1rem;">
+                <a th:href="@{/admin/coupons}" style="border-radius: 40px; padding: 8px 24px; font-weight: 500; transition: all 0.2s; color: #2d6a2f; background-color: transparent; border: 1px solid #bddcb5; text-decoration: none; display: inline-block; font-size: 0.875rem;">
+                    <i class="fas fa-arrow-left"></i> Trở về danh sách
+                </a>
             </div>
 
-            <div class="card-body p-4">
-                <form th:action="@{/admin/coupons/save}" th:object="${coupon}" method="post">
-                    <input type="hidden" th:field="*{id}">
+            <!-- Card chính -->
+            <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15);">
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Mã giảm giá</label>
-                                <input type="text" th:field="*{code}" class="form-control"
-                                       placeholder="VD: KHUYENMAI2026" required>
-                                <small class="text-muted" th:if="${coupon.id == null}">Hệ thống sẽ tự tạo nếu bạn để trống.</small>
-                            </div>
+                <!-- Card Header -->
+                <div style="background: white; padding: 1.25rem 1.5rem; border-bottom: 2px solid #eaf5e6;">
+                    <h1 style="margin: 0; font-weight: 700; color: #1f4f2b; font-size: 1.75rem;">
+                        <i class="fas fa-ticket-alt me-2" style="color: #4caf50;"></i>
+                        <span th:text="${coupon.id != null ? 'Sửa mã giảm giá' : 'Thêm mã giảm giá'}"></span>
+                    </h1>
+                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Tên chương trình / Mô tả ngắn</label>
-                                <input type="text" th:field="*{description}" class="form-control"
-                                       placeholder="Nhập tên chương trình..." required>
-                            </div>
+                <!-- Card Body -->
+                <div style="padding: 2rem;">
+                    <form th:action="@{/admin/coupons/save}" th:object="${coupon}" method="post">
+                        <input type="hidden" th:field="*{id}">
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Loại sản phẩm áp dụng</label>
-                                <select name="categoryIds" class="form-select" multiple style="height: 120px;" required>
-                                    <option th:each="cat : ${categories}"
-                                            th:value="${cat.id}"
-                                            th:text="${cat.name}"
-                                            th:selected="${coupon.appliedCategories != null && coupon.appliedCategories.contains(cat)}">
-                                    </option>
-                                </select>
-                                <small class="text-muted">Giữ Ctrl để chọn nhiều loại sản phẩm.</small>
-                            </div>
-                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+                            <!-- Cột trái -->
+                            <div style="flex: 1; min-width: 280px;">
+                                <!-- Mã giảm giá -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-barcode me-2" style="color: #4caf50;"></i> Mã giảm giá
+                                    </label>
+                                    <input type="text" th:field="*{code}" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;" placeholder="VD: KHUYENMAI2026" required>
+                                    <small th:if="${coupon.id == null}" style="display: block; margin-top: 6px; font-size: 0.75rem; color: #6c757d;">
+                                        <i class="fas fa-info-circle"></i> Hệ thống sẽ tự tạo nếu bạn để trống.
+                                    </small>
+                                </div>
 
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Giá trị giảm</label>
-                                <div class="input-group">
-                                    <input type="number" th:field="*{discountValue}" class="form-control" step="0.1" required>
-                                    <select th:field="*{discountType}" class="form-select" style="max-width: 100px;">
-                                        <option value="percent">%</option>
-                                        <option value="amount">VNĐ</option>
+                                <!-- Tên chương trình -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-tag me-2" style="color: #4caf50;"></i> Tên chương trình / Mô tả ngắn
+                                    </label>
+                                    <input type="text" th:field="*{description}" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;" placeholder="Nhập tên chương trình..." required>
+                                </div>
+
+                                <!-- Loại sản phẩm áp dụng -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-folder-tree me-2" style="color: #4caf50;"></i> Loại sản phẩm áp dụng
+                                    </label>
+                                    <select name="categoryIds" multiple style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s; height: 120px; cursor: pointer;" required>
+                                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${coupon.appliedCategories != null && coupon.appliedCategories.contains(cat)}"></option>
                                     </select>
+                                    <small style="display: block; margin-top: 6px; font-size: 0.75rem; color: #6c757d;">
+                                        <i class="fas fa-info-circle"></i> Giữ Ctrl để chọn nhiều loại sản phẩm.
+                                    </small>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <label class="form-label fw-bold">Ngày bắt đầu</label>
-                                    <input type="date" th:field="*{startDate}" class="form-control" required>
+                            <!-- Cột phải -->
+                            <div style="flex: 1; min-width: 280px;">
+                                <!-- Giá trị giảm -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-percent me-2" style="color: #4caf50;"></i> Giá trị giảm
+                                    </label>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <input type="number" th:field="*{discountValue}" style="flex: 2; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;" step="0.1" required>
+                                        <select th:field="*{discountType}" style="flex: 1; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s; cursor: pointer;">
+                                            <option value="percent" style="color: #ff9800;">%</option>
+                                            <option value="amount" style="color: #2196f3;">VNĐ</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-6 mb-3">
-                                    <label class="form-label fw-bold">Ngày kết thúc</label>
-                                    <input type="date" th:field="*{endDate}" class="form-control" required>
-                                </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Trạng thái</label>
-                                <div class="form-check form-switch mt-2">
-                                    <input class="form-check-input" type="checkbox" id="statusSwitch"
-                                           th:checked="${coupon.status == 'Còn hiệu lực'}"
-                                           onclick="updateStatusValue(this)">
-                                    <label class="form-check-label" for="statusSwitch" id="statusLabel"
-                                           th:text="${coupon.status == 'Còn hiệu lực' ? 'Còn hiệu lực' : 'Hết hạn'}"></label>
-                                    <input type="hidden" th:field="*{status}" id="statusHidden">
+                                <!-- Ngày bắt đầu và kết thúc -->
+                                <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                                    <div style="flex: 1;">
+                                        <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                            <i class="fas fa-calendar-alt me-2" style="color: #4caf50;"></i> Ngày bắt đầu
+                                        </label>
+                                        <input type="date" th:field="*{startDate}" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;" required>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                            <i class="fas fa-calendar-check me-2" style="color: #dc3545;"></i> Ngày kết thúc
+                                        </label>
+                                        <input type="date" th:field="*{endDate}" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;" required>
+                                    </div>
+                                </div>
+
+                                <!-- Trạng thái -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-circle-info me-2" style="color: #4caf50;"></i> Trạng thái
+                                    </label>
+                                    <div style="margin-top: 0.5rem;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleStatus()">
+                                            <div style="position: relative; display: inline-block; width: 52px; height: 26px;">
+                                                <input type="checkbox" id="statusSwitch" style="opacity: 0; width: 0; height: 0;" th:checked="${coupon.status == 'Còn hiệu lực'}" onclick="updateStatusValue(this)">
+                                                <span id="statusSlider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 26px;"></span>
+                                                <span id="statusDot" style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%;"></span>
+                                            </div>
+                                            <label id="statusLabel" style="font-weight: 500; cursor: pointer; margin: 0; color: #2c5e2e;" th:text="${coupon.status == 'Còn hiệu lực' ? 'Còn hiệu lực' : 'Hết hạn'}"></label>
+                                            <input type="hidden" th:field="*{status}" id="statusHidden">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-12">
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Mô tả chi tiết</label>
-                                <textarea class="form-control" rows="4" placeholder="Nhập nội dung chi tiết về chương trình khuyến mãi..."></textarea>
-                            </div>
+                        <!-- Mô tả chi tiết (full width) -->
+                        <div style="margin-bottom: 2rem;">
+                            <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                <i class="fas fa-align-left me-2" style="color: #4caf50;"></i> Mô tả chi tiết
+                            </label>
+                            <textarea class="form-control" rows="4" placeholder="Nhập nội dung chi tiết về chương trình khuyến mãi..." style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s; resize: vertical;"></textarea>
                         </div>
-                    </div>
 
-                    <div class="d-flex gap-2 justify-content-center border-top pt-4">
-                        <button type="submit" class="btn btn-primary px-5"
-                                th:text="${coupon.id != null ? 'Cập nhật' : 'Thêm mới'}"></button>
-                        <a th:href="@{/admin/coupons}" class="btn btn-light border px-5">Hủy</a>
-                    </div>
-                </form>
+                        <!-- Buttons -->
+                        <div style="display: flex; gap: 1rem; justify-content: center; padding-top: 1.5rem; border-top: 2px solid #eaf5e6;">
+                            <button type="submit" style="border-radius: 40px; padding: 10px 40px; font-weight: 600; transition: all 0.2s; color: #fff; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); border: none; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);">
+                                <i class="fas fa-save me-2"></i> <span th:text="${coupon.id != null ? 'Cập nhật' : 'Thêm mới'}"></span>
+                            </button>
+                            <a th:href="@{/admin/coupons}" style="border-radius: 40px; padding: 10px 40px; font-weight: 600; transition: all 0.2s; color: #6c757d; background-color: transparent; border: 1px solid #ced4da; text-decoration: none; display: inline-block;">
+                                <i class="fas fa-times me-2"></i> Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        /* Hover effects */
+        a[style*="border-radius: 40px"]:hover {
+            background-color: #4caf50 !important;
+            color: white !important;
+            border-color: #4caf50 !important;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.35) !important;
+        }
+
+        a[style*="border: 1px solid #ced4da"]:hover {
+            background-color: #6c757d !important;
+            color: white !important;
+            border-color: #6c757d !important;
+        }
+
+        /* Focus cho input, select, textarea */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+        }
+
+        /* Hiệu ứng hover cho card */
+        div[style*="border-radius: 24px"]:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(76, 175, 80, 0.12) !important;
+        }
+
+        /* Style cho select multiple */
+        select[multiple] option {
+            padding: 8px;
+            border-radius: 8px;
+            margin: 2px;
+        }
+
+        select[multiple] option:checked {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            color: white;
+        }
+
+        select[multiple] option:hover {
+            background-color: #eaf5e6;
+        }
+
+        /* Style cho toggle switch */
+        input#statusSwitch:checked + span#statusSlider {
+            background-color: #4caf50 !important;
+        }
+
+        input#statusSwitch:checked + span#statusSlider + span#statusDot {
+            transform: translateX(26px);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            div[style*="background-color: #edf7e9"] {
+                padding: 15px !important;
+            }
+
+            div[style*="max-width: 85%"] {
+                max-width: 100% !important;
+            }
+
+            div[style*="display: flex; flex-wrap: wrap; gap: 2rem"] {
+                flex-direction: column !important;
+                gap: 0 !important;
+            }
+
+            button[type="submit"], a[style*="border-radius: 40px"] {
+                padding: 8px 24px !important;
+                font-size: 0.875rem !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            div[style*="padding: 2rem"] {
+                padding: 1rem !important;
+            }
+
+            h1 {
+                font-size: 1.5rem !important;
+            }
+
+            div[style*="display: flex; gap: 1rem"] {
+                flex-direction: column !important;
+            }
+
+            button[type="submit"], a[style*="border-radius: 40px"] {
+                width: 100% !important;
+                text-align: center !important;
+            }
+        }
+
+        /* Animation fadeIn */
+        form {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 
     <script>
         function updateStatusValue(checkbox) {
             const hiddenInput = document.getElementById('statusHidden');
             const label = document.getElementById('statusLabel');
+            const slider = document.getElementById('statusSlider');
+            const dot = document.getElementById('statusDot');
+
             if (checkbox.checked) {
                 hiddenInput.value = "Còn hiệu lực";
                 label.innerText = "Còn hiệu lực";
+                slider.style.backgroundColor = "#4caf50";
+                dot.style.transform = "translateX(26px)";
             } else {
                 hiddenInput.value = "Hết hạn";
                 label.innerText = "Hết hạn";
+                slider.style.backgroundColor = "#ccc";
+                dot.style.transform = "translateX(0)";
             }
         }
+
+        function toggleStatus() {
+            const checkbox = document.getElementById('statusSwitch');
+            checkbox.checked = !checkbox.checked;
+            updateStatusValue(checkbox);
+        }
+
+        // Khởi tạo trạng thái ban đầu cho toggle switch
+        window.addEventListener('DOMContentLoaded', function() {
+            const checkbox = document.getElementById('statusSwitch');
+            if (checkbox) {
+                updateStatusValue(checkbox);
+            }
+        });
     </script>
 </section>
 </html>
