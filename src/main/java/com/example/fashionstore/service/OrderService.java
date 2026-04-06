@@ -1,11 +1,16 @@
 package com.example.fashionstore.service;
 
-import com.example.fashionstore.model.Order;
-import com.example.fashionstore.model.OrderDetail;
+import com.example.fashionstore.model.*;
 import com.example.fashionstore.repository.OrderDetailRepository;
 import com.example.fashionstore.repository.OrderRepository;
+import com.example.fashionstore.repository.ProductRepository;
+import com.example.fashionstore.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,6 +21,12 @@ public class OrderService {
 
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private UserRepository userRepository; // Bổ sung UserRepository để tìm User
 
     // Lấy tất cả đơn hàng
     public List<Order> getAllOrders() {
@@ -47,5 +58,85 @@ public class OrderService {
     // Lấy danh sách sản phẩm trong 1 đơn hàng
     public List<OrderDetail> getOrderDetails(Long orderId) {
         return orderDetailRepository.findByOrderId(orderId);
+    }
+
+    @Transactional
+    public Order placeOrder(Order order, List<CartItem> cartItems, Double totalAmount) {
+        // 1. Sinh mã đơn hàng ngẫu nhiên và thiết lập thông tin cơ bản
+        order.setOrderCode("OD" + System.currentTimeMillis());
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus("Đang xử lý");
+        order.setTotalAmount(totalAmount);
+
+        // 2. Lưu Order vào bảng orders để lấy ID
+        Order savedOrder = orderRepository.save(order);
+
+        // 3. Duyệt qua giỏ hàng để lưu chi tiết và trừ kho
+        for (CartItem item : cartItems) {
+            OrderDetail detail = new OrderDetail();
+            detail.setOrder(savedOrder);
+
+            // Tìm Product thật trong DB
+            Product product = productRepository.findById(item.getProductId()).orElse(null);
+            if (product != null) {
+                detail.setProduct(product);
+
+                // === BẮT ĐẦU CẬP NHẬT KHO ===
+                // Trừ số lượng trong kho
+                int newQuantity = product.getQuantity() - item.getQuantity();
+                product.setQuantity(Math.max(newQuantity, 0)); // Đảm bảo kho không bị số âm
+
+                // Tăng số lượng đã bán (phục vụ chức năng Bán chạy nhất)
+                int currentSold = product.getSoldQuantity() != null ? product.getSoldQuantity() : 0;
+                product.setSoldQuantity(currentSold + item.getQuantity());
+
+                // Lưu cập nhật sản phẩm vào database
+                productRepository.save(product);
+                // === KẾT THÚC CẬP NHẬT KHO ===
+            }
+
+            detail.setQuantity(item.getQuantity());
+            detail.setPrice(item.getPrice());
+            // Sử dụng getSubtotal() từ class CartItem của bạn
+            detail.setSubTotal(item.getSubtotal());
+
+            orderDetailRepository.save(detail);
+        }
+
+        return savedOrder;
+    }
+
+    // Lấy lịch sử mua hàng của khách hàng
+    public List<Order> getOrdersByUser(User user) {
+        if (user == null) return new java.util.ArrayList<>();
+        return orderRepository.findByUserOrderByOrderDateDesc(user);
+    }
+
+    // Hàm tìm đơn hàng theo ID
+    public Order findById(Long id) {
+        return orderRepository.findById(id).orElse(null);
+    }
+
+    // ==============================================================
+    // HÀM MỚI BỔ SUNG: LẤY CHI TIẾT LỊCH SỬ SẢN PHẨM CỦA USER
+    // ==============================================================
+    public List<OrderDetail> getHistoryByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+
+        // Lấy danh sách các đơn hàng của User này
+        List<Order> orders = getOrdersByUser(user);
+        
+        // Tạo một list rỗng để gom tất cả các chi tiết sản phẩm lại
+        List<OrderDetail> historyDetails = new ArrayList<>();
+        
+        // Duyệt qua từng đơn hàng, lấy chi tiết ném vào list tổng
+        for (Order order : orders) {
+            historyDetails.addAll(getOrderDetails(order.getId()));
+        }
+        
+        return historyDetails;
     }
 }

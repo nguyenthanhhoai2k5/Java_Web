@@ -39,7 +39,7 @@ public class ShopProductController {
                                     HttpSession session) {
         model.addAttribute("product", shopProductService.findProductByIdOrThrow(productId));
         addCartSummary(model, session);
-        return "shop/product-detail";
+        return "user_product_detail";
     }
 
     private void addCartSummary(Model model, HttpSession session) {

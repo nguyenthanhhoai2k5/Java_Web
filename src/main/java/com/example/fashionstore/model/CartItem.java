@@ -14,6 +14,7 @@ public class CartItem {
     // Số lượng trong giỏ
     private int quantity;
 
+    private String image;
     public CartItem() {
     }
 
@@ -22,6 +23,7 @@ public class CartItem {
         this.productName = productName;
         this.price = price;
         this.quantity = quantity;
+        this.image = image;
     }
 
     public Long getProductId() {
@@ -54,6 +56,14 @@ public class CartItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     // Tính tiền của 1 dòng sản phẩm trong giỏ hàng

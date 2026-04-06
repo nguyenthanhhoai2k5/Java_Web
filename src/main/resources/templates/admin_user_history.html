@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
+<section>
+  <div style="background-color: #edf7e9; padding: 20px 30px; min-height: 100vh; width: 100%; box-sizing: border-box;">
+    <div style="max-width: 90%; margin: 0 auto;">
+
+      <!-- Nút trở về -->
+      <div style="margin-bottom: 1rem;">
+        <a href="javascript:history.go(-1)"
+           style="border-radius: 40px; padding: 8px 24px; font-weight: 500; transition: all 0.2s; color: #2d6a2f; background-color: transparent; border: 1px solid #bddcb5; text-decoration: none; display: inline-block; font-size: 0.875rem;">
+          <i class="fas fa-arrow-left"></i> Trở về
+        </a>
+      </div>
+
+      <!-- Tiêu đề chính -->
+      <h1 style="font-weight: 700; color: #1f4f2b; border-left: 6px solid #4caf50; padding-left: 18px; margin-bottom: 1.8rem; font-size: 1.85rem;">
+        <i class="fas fa-history me-2" style="color: #4caf50;"></i> Lịch sử mua hàng của:
+        <span style="color: #2e7d32; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" th:text="${user.fullName}"></span>
+      </h1>
+
+      <!-- Card lọc -->
+      <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15); margin-bottom: 1.5rem;">
+        <div style="padding: 1.5rem;">
+          <form th:action="@{'/admin/users/history/' + ${user.id}}" method="get" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+            <div style="flex: 2; min-width: 200px;">
+              <input type="text" name="keyword" class="form-control" placeholder="🔍 Tên sản phẩm..." th:value="${keyword}" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;">
+            </div>
+            <div style="flex: 1.5; min-width: 150px;">
+              <input type="date" name="startDate" class="form-control" th:value="${startDate}" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;">
+            </div>
+            <div style="flex: 1.5; min-width: 150px;">
+              <input type="date" name="endDate" class="form-control" th:value="${endDate}" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;">
+            </div>
+            <div style="flex: 1; min-width: 100px;">
+              <button type="submit" style="width: 100%; border-radius: 40px; padding: 10px 24px; font-weight: 600; transition: all 0.2s; color: #fff; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); border: none; cursor: pointer;">
+                <i class="fas fa-filter me-2"></i> Lọc
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Card bảng lịch sử -->
+      <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15);">
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; margin-bottom: 0; color: #212529; border-collapse: collapse;">
+            <thead style="background: linear-gradient(135deg, #1f4f2b 0%, #2e7d32 100%); color: white;">
+            <tr>
+              <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">STT</th>
+              <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Mã đơn</th>
+              <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Sản phẩm</th>
+              <th style="padding: 1rem; text-align: center; font-weight: 600; border-bottom: 2px solid #4caf50;">Số lượng</th>
+              <th style="padding: 1rem; text-align: right; font-weight: 600; border-bottom: 2px solid #4caf50;">Giá mua</th>
+              <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Ngày mua</th>
+              <th style="padding: 1rem; text-align: center; font-weight: 600; border-bottom: 2px solid #4caf50;">Trạng thái</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(history)}">
+              <td colspan="7" style="text-align: center; padding: 3rem; font-weight: bold; color: #6c757d; font-size: 1.1rem;">
+                <i class="fas fa-shopping-bag" style="font-size: 2rem; display: block; margin-bottom: 1rem; color: #cfe3ca;"></i>
+                Không có lịch sử mua hàng
+              </td>
+            </tr>
+
+            <tr th:each="detail, state : ${history}" style="border-bottom: 1px solid #eaf5e6; transition: all 0.2s;">
+              <td style="padding: 1rem; vertical-align: middle; color: #2c3e2d;" th:text="${state.count}">1</td>
+              <td style="padding: 1rem; vertical-align: middle;">
+                <span style="display: inline-block; padding: 4px 12px; background-color: #eaf5e6; border-radius: 20px; font-weight: 600; color: #2e7d32; font-size: 0.875rem;" th:text="${'ORD-' + detail.order.id}">ORD-001</span>
+              </td>
+              <td style="padding: 1rem; vertical-align: middle;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <img th:src="@{'/images/' + ${detail.product.image}}" style="width: 80px; height: 70px; object-fit: cover; border-radius: 12px; border: 1px solid #eaf5e6;">
+                  <div>
+                    <div style="font-weight: 700; color: #2c3e2d; margin-bottom: 4px;" th:text="${detail.product.name}">Tên sản phẩm</div>
+                    <small style="color: #6c757d; font-size: 0.75rem;" th:text="${detail.product.category.name}">Danh mục</small>
+                  </div>
+                </div>
+              </td>
+              <td style="padding: 1rem; text-align: center; vertical-align: middle;">
+                <span style="display: inline-block; padding: 4px 12px; background-color: #4caf50; color: white; border-radius: 20px; font-weight: 600; font-size: 0.875rem;" th:text="${detail.quantity}">1</span>
+              </td>
+              <td style="padding: 1rem; text-align: right; vertical-align: middle;">
+                <span style="font-weight: 700; color: #dc3545; font-size: 1rem;" th:text="${#numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">250,000 VNĐ</span>              
+              </td>
+              <td style="padding: 1rem; vertical-align: middle; color: #6c757d;">
+                <i class="fas fa-calendar-alt me-1" style="color: #4caf50;"></i>
+                <span th:text="${#temporals.format(detail.order.orderDate, 'dd/MM/yyyy HH:mm')}">12/05/2026 14:30</span>
+              </td>
+              <td style="padding: 1rem; text-align: center; vertical-align: middle;">
+                                    <span th:if="${detail.order.status == 'Đã giao hàng'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border-radius: 20px; font-weight: 600; font-size: 0.75rem;">
+                                        <i class="fas fa-check-circle me-1"></i> Đã giao
+                                    </span>
+                <span th:if="${detail.order.status == 'Đã hủy'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border-radius: 20px; font-weight: 600; font-size: 0.75rem;">
+                                        <i class="fas fa-times-circle me-1"></i> Đã hủy
+                                    </span>
+                <span th:if="${detail.order.status == 'Đang xử lý'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #2c3e2d; border-radius: 20px; font-weight: 600; font-size: 0.75rem;">
+                                        <i class="fas fa-spinner me-1"></i> Đang xử lý
+                                    </span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Hover effects cho các nút */
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.35) !important;
+    }
+
+    a[style*="border-radius: 40px"]:hover {
+      background-color: #4caf50 !important;
+      color: white !important;
+      border-color: #4caf50 !important;
+    }
+
+    /* Hover cho dòng trong bảng */
+    tbody tr:hover {
+      background-color: #f3fcef !important;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    /* Focus cho input */
+    input:focus {
+      outline: none;
+      border-color: #4caf50 !important;
+      box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+    }
+
+    /* Hiệu ứng hover cho card */
+    div[style*="border-radius: 24px"]:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 25px 50px rgba(76, 175, 80, 0.12) !important;
+    }
+
+    /* Animation fadeIn */
+    table {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      div[style*="background-color: #edf7e9"] {
+        padding: 15px !important;
+      }
+
+      div[style*="max-width: 90%"] {
+        max-width: 100% !important;
+      }
+
+      form[style*="display: flex; flex-wrap: wrap; gap: 1rem"] {
+        flex-direction: column !important;
+      }
+
+      form[style*="display: flex; flex-wrap: wrap; gap: 1rem"] > div {
+        width: 100% !important;
+      }
+
+      table {
+        font-size: 0.875rem;
+      }
+
+      th, td {
+        padding: 0.75rem !important;
+      }
+
+      div[style*="display: flex; align-items: center; gap: 1rem"] {
+        flex-direction: column;
+        align-items: flex-start !important;
+      }
+
+      img[style*="width: 80px"] {
+        width: 60px !important;
+        height: 50px !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      table {
+        font-size: 0.75rem;
+      }
+
+      th, td {
+        padding: 0.5rem !important;
+      }
+
+      h1 {
+        font-size: 1.5rem !important;
+      }
+
+      span[style*="font-size: 0.875rem"] {
+        font-size: 0.7rem !important;
+      }
+
+      div[style*="padding: 1.5rem"] {
+        padding: 1rem !important;
+      }
+    }
+
+    /* Scrollbar đẹp */
+    div[style*="overflow-x: auto"]::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+      background: #4caf50;
+      border-radius: 10px;
+    }
+
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover {
+      background: #2e7d32;
+    }
+
+    /* Style cho date input */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(0.5);
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      filter: invert(0.3);
+    }
+  </style>
+</section>
+</html>

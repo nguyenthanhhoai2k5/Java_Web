@@ -1,64 +1,265 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
 <section>
-    <div class="container mt-4" style="max-width: 90%;">
-        <div class="mb-3 d-flex justify-content-between align-items-center">
-            <h1 class="h3 text-primary"><i class="bi bi-receipt me-2"></i>Chi Tiết Đơn Hàng: <span th:text="${order.orderCode}">OD001</span></h1>
-            <a th:href="@{/admin/order}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Trở về</a>
-        </div>
+    <div style="background-color: #edf7e9; padding: 20px 30px; min-height: 100vh; width: 100%; box-sizing: border-box;">
+        <div style="max-width: 90%; margin: 0 auto;">
 
-        <div class="row g-4">
-            <div class="col-md-8">
-                <div class="card shadow border-0 h-100">
-                    <div class="card-header bg-white"><h5 class="mb-0 fw-bold">Danh sách sản phẩm</h5></div>
-                    <div class="card-body">
-                        <table class="table align-middle">
-                            <thead class="table-light">
-                            <tr><th>Sản Phẩm</th><th>Đơn Giá</th><th>SL</th><th>Thành Tiền</th></tr>
-                            </thead>
-                            <tbody>
-                            <tr th:if="${#lists.isEmpty(orderDetails)}">
-                                <td colspan="4" class="text-center py-3 text-muted">Không có chi tiết sản phẩm.</td>
-                            </tr>
-                            <tr th:each="item : ${orderDetails}">
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img th:if="${item.product.image != null}" th:src="@{'/images/' + ${item.product.image}}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                                        <span th:text="${item.product.name}">Tên SP</span>
-                                    </div>
-                                </td>
-                                <td th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
-                                <td th:text="${item.quantity}">1</td>
-                                <td class="fw-bold text-success" th:text="${#numbers.formatDecimal(item.subTotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <hr>
-                        <div class="d-flex justify-content-between fs-5 fw-bold text-danger">
-                            <span>Tổng thanh toán:</span>
-                            <span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+            <!-- Header và nút trở về -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                <h1 style="font-weight: 700; color: #1f4f2b; border-left: 6px solid #4caf50; padding-left: 18px; margin: 0; font-size: 1.85rem;">
+                    <i class="fas fa-receipt me-2" style="color: #4caf50;"></i> Chi Tiết Đơn Hàng:
+                    <span style="color: #2e7d32;" th:text="${order.orderCode}">OD001</span>
+                </h1>
+                <a th:href="@{/admin/order}" style="border-radius: 40px; padding: 8px 24px; font-weight: 500; transition: all 0.2s; color: #2d6a2f; background-color: transparent; border: 1px solid #bddcb5; text-decoration: none; display: inline-block;">
+                    <i class="fas fa-arrow-left"></i> Trở về
+                </a>
+            </div>
+
+            <!-- Grid 2 cột -->
+            <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+
+                <!-- Cột trái: Danh sách sản phẩm (chiếm 2/3) -->
+                <div style="flex: 2; min-width: 250px;">
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15); height: 100%;">
+
+                        <!-- Card Header -->
+                        <div style="background: white; padding: 1rem 1.5rem; border-bottom: 2px solid #eaf5e6;">
+                            <h5 style="margin: 0; font-weight: 700; color: #1f4f2b; font-size: 1.1rem;">
+                                <i class="fas fa-boxes me-2" style="color: #4caf50;"></i> Danh sách sản phẩm
+                            </h5>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div style="padding: 1.5rem;">
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; margin-bottom: 1.5rem; color: #212529; border-collapse: collapse;">
+                                    <thead>
+                                    <tr style="background: linear-gradient(135deg, #eaf5e6 0%, #d4efcf 100%); border-radius: 16px;">
+                                        <th style="padding: 12px; text-align: left; font-weight: 700; color: #1f4f2b;">Sản Phẩm</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 700; color: #1f4f2b;">Đơn Giá</th>
+                                        <th style="padding: 12px; text-align: center; font-weight: 700; color: #1f4f2b;">SL</th>
+                                        <th style="padding: 12px; text-align: right; font-weight: 700; color: #1f4f2b;">Thành Tiền</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:if="${#lists.isEmpty(orderDetails)}">
+                                        <td colspan="4" style="text-align: center; padding: 3rem; color: #6c757d; font-weight: 500;">
+                                            <i class="fas fa-box-open" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #cfe3ca;"></i>
+                                            Không có chi tiết sản phẩm
+                                        </td>
+                                    </tr>
+                                    <tr th:each="item : ${orderDetails}" style="border-bottom: 1px solid #f0f0f0;">
+                                        <td style="padding: 12px; vertical-align: middle;">
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <img th:if="${item.product.image != null}" th:src="@{'/images/' + ${item.product.image}}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 12px; border: 1px solid #eaf5e6;">
+                                                <span style="font-weight: 500; color: #2c3e2d;" th:text="${item.product.name}">Tên SP</span>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; vertical-align: middle; color: #4a5568;" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
+                                        <td style="padding: 12px; text-align: center; vertical-align: middle;">
+                                            <span style="display: inline-block; padding: 4px 10px; background-color: #eaf5e6; border-radius: 20px; font-weight: 600; color: #2e7d32;" th:text="${item.quantity}">1</span>
+                                        </td>
+                                        <td style="padding: 12px; text-align: right; vertical-align: middle;">
+                                            <span style="font-weight: 700; color: #4caf50; font-size: 1rem;" th:text="${#numbers.formatDecimal(item.subTotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <hr style="border: none; border-top: 2px dashed #e0e8dc; margin: 1rem 0;">
+
+                            <!-- Tổng thanh toán -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; padding-top: 0.5rem;">
+                                <span style="color: #dc3545; font-size: 1.1rem;">Tổng thanh toán:</span>
+                                <span style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.5rem;" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card shadow border-0 mb-4">
-                    <div class="card-header bg-white"><h5 class="mb-0 fw-bold">Khách hàng</h5></div>
-                    <div class="card-body">
-                        <p class="mb-2"><i class="bi bi-person-fill me-2 text-primary"></i> <strong th:text="${order.customerName}">Tên KH</strong></p>
-                        <p class="mb-2"><i class="bi bi-telephone-fill me-2 text-primary"></i> <span th:text="${order.phone}">SĐT</span></p>
-                        <p class="mb-0"><i class="bi bi-envelope-fill me-2 text-primary"></i> <span th:text="${order.email}">Email</span></p>
+                <!-- Cột phải: Thông tin khách hàng và giao hàng (chiếm 1/3) -->
+                <div style="flex: 1; min-width: 250px;">
+
+                    <!-- Card thông tin khách hàng -->
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15); margin-bottom: 1.5rem;">
+                        <div style="background: white; padding: 1rem 1.5rem; border-bottom: 2px solid #eaf5e6;">
+                            <h5 style="margin: 0; font-weight: 700; color: #1f4f2b; font-size: 1.1rem;">
+                                <i class="fas fa-user-circle me-2" style="color: #4caf50;"></i> Khách hàng
+                            </h5>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-user" style="color: #4caf50; width: 20px;"></i>
+                                <strong style="color: #2c5e2e;">Tên:</strong>
+                                <span th:text="${order.customerName}" style="color: #2c3e2d;">Tên KH</span>
+                            </p>
+                            <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-phone" style="color: #4caf50; width: 20px;"></i>
+                                <strong style="color: #2c5e2e;">SĐT:</strong>
+                                <span th:text="${order.phone}" style="color: #2c3e2d;">SĐT</span>
+                            </p>
+                            <p style="margin-bottom: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-envelope" style="color: #4caf50; width: 20px;"></i>
+                                <strong style="color: #2c5e2e;">Email:</strong>
+                                <span th:text="${order.email}" style="color: #2c3e2d; word-break: break-word;">Email</span>
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="card shadow border-0">
-                    <div class="card-header bg-white"><h5 class="mb-0 fw-bold">Giao hàng</h5></div>
-                    <div class="card-body">
-                        <p class="mb-0"><i class="bi bi-geo-alt-fill me-2 text-danger"></i> <span th:text="${order.address}">Địa chỉ</span></p>
+
+                    <!-- Card thông tin giao hàng -->
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15);">
+                        <div style="background: white; padding: 1rem 1.5rem; border-bottom: 2px solid #eaf5e6;">
+                            <h5 style="margin: 0; font-weight: 700; color: #1f4f2b; font-size: 1.1rem;">
+                                <i class="fas fa-truck me-2" style="color: #4caf50;"></i> Giao hàng
+                            </h5>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <p style="margin-bottom: 0; display: flex; align-items: flex-start; gap: 0.5rem;">
+                                <i class="fas fa-map-marker-alt" style="color: #dc3545; width: 20px; margin-top: 3px;"></i>
+                                <strong style="color: #2c5e2e;">Địa chỉ:</strong>
+                                <span th:text="${order.address}" style="color: #2c3e2d; flex: 1; word-break: break-word;">Địa chỉ</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card thông tin đơn hàng bổ sung -->
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15); margin-top: 1.5rem;">
+                        <div style="background: white; padding: 1rem 1.5rem; border-bottom: 2px solid #eaf5e6;">
+                            <h5 style="margin: 0; font-weight: 700; color: #1f4f2b; font-size: 1.1rem;">
+                                <i class="fas fa-info-circle me-2" style="color: #4caf50;"></i> Thông tin đơn hàng
+                            </h5>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-calendar" style="color: #4caf50; width: 20px;"></i>
+                                <strong style="color: #2c5e2e;">Ngày đặt:</strong>
+                                <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}" style="color: #2c3e2d;">12/05/2026 14:30</span>
+                            </p>
+                            <p style="margin-bottom: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-chart-line" style="color: #4caf50; width: 20px;"></i>
+                                <strong style="color: #2c5e2e;">Trạng thái:</strong>
+                                <span th:if="${order.status == 'Đang xử lý'}" style="display: inline-block; padding: 4px 12px; background-color: #fff3cd; color: #856404; border-radius: 20px; font-weight: 600; font-size: 0.875rem;">⚡ Đang xử lý</span>
+                                <span th:if="${order.status == 'Đã giao hàng'}" style="display: inline-block; padding: 4px 12px; background-color: #d4edda; color: #155724; border-radius: 20px; font-weight: 600; font-size: 0.875rem;">✅ Đã giao hàng</span>
+                                <span th:if="${order.status == 'Đã hủy'}" style="display: inline-block; padding: 4px 12px; background-color: #f8d7da; color: #721c24; border-radius: 20px; font-weight: 600; font-size: 0.875rem;">❌ Đã hủy</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <style>
+        /* Hover effects cho card */
+        div[style*="border-radius: 24px"]:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(76, 175, 80, 0.12) !important;
+        }
+
+        /* Hover cho nút trở về */
+        a[style*="border-radius: 40px"]:hover {
+            background-color: #4caf50 !important;
+            color: white !important;
+            border-color: #4caf50 !important;
+        }
+
+        /* Hover cho dòng trong bảng */
+        tbody tr:hover {
+            background-color: #f9fff7 !important;
+            transition: all 0.2s;
+        }
+
+        /* Animation nhẹ cho cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        div[style*="flex: 2"] > div,
+        div[style*="flex: 1"] > div {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            div[style*="background-color: #edf7e9"] {
+                padding: 15px !important;
+            }
+
+            div[style*="display: flex; flex-wrap: wrap; gap: 1.5rem"] {
+                flex-direction: column !important;
+            }
+
+            div[style*="flex: 2"], div[style*="flex: 1"] {
+                flex: 1 !important;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            td, th {
+                padding: 8px !important;
+            }
+
+            img[style*="width: 50px"] {
+                width: 40px !important;
+                height: 40px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            div[style*="display: flex; justify-content: space-between"] {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+
+            div[style*="display: flex; justify-content: space-between; font-size: 1.25rem"] {
+                flex-direction: row !important;
+            }
+
+            span[style*="font-size: 1.5rem"] {
+                font-size: 1.2rem !important;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            td, th {
+                padding: 6px !important;
+            }
+
+            p[style*="display: flex"] {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Scrollbar đẹp cho bảng */
+        div[style*="overflow-x: auto"]::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+            background: #4caf50;
+            border-radius: 10px;
+        }
+
+        div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover {
+            background: #2e7d32;
+        }
+    </style>
 </section>
 </html>

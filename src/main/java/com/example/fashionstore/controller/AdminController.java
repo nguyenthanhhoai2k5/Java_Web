@@ -18,7 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.example.fashionstore.service.UserService;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,6 +50,16 @@ public class AdminController {
     @Autowired
     private StatisticsService statisticsService;
 
+    @Autowired
+    private UserService userService;
+    
+    // ==============================================================
+    // TRANG ĐĂNG NHẬP ADMIN
+    // ==============================================================
+    @GetMapping("/login")
+    public String showAdminLoginPage() {
+        return "admin_login";
+    }
     // ==============================================================
     // TRANG CHỦ ADMIN (DASHBOARD)
     // ==============================================================
@@ -145,18 +155,24 @@ public class AdminController {
         return "redirect:/admin/category";
     }
 
-    @GetMapping("/product/delete/{id}")
+@GetMapping("/product/delete/{id}")
     public String deleteProduct(@PathVariable("id") Long id, RedirectAttributes ra) {
         Product product = productService.getById(id);
         if (product != null) {
             try {
-                Path path = Paths.get("src/main/resources/static/images/" + product.getImage());
-                Files.deleteIfExists(path);
+                // Thử xóa sản phẩm
+                productService.delete(id);
+                
+                // Nếu xóa Database thành công thì mới xóa ảnh vật lý
+                if (product.getImage() != null) {
+                    Path path = Paths.get("src/main/resources/static/images/" + product.getImage());
+                    Files.deleteIfExists(path);
+                }
+                ra.addFlashAttribute("message", "Đã xóa sản phẩm thành công!");
             } catch (Exception e) {
-                e.printStackTrace();
+                // Bẫy lỗi 500 do khóa ngoại (Sản phẩm đã nằm trong đơn hàng)
+                ra.addFlashAttribute("error", "Không thể xóa! Sản phẩm này đã tồn tại trong lịch sử đơn hàng. Hãy chuyển trạng thái thành 'Cũ' thay vì xóa.");
             }
-            productService.delete(id);
-            ra.addFlashAttribute("message", "Đã xóa sản phẩm thành công!");
         }
         return "redirect:/admin/category";
     }
@@ -285,11 +301,101 @@ public class AdminController {
     public String showStatistics(Model model) {
         model.addAttribute("page", "statistics");
 
-        // Gọi Service để lấy dữ liệu thống kê đẩy ra View
+        // 3 Thẻ tổng quan
         model.addAttribute("currentMonthSales", statisticsService.getCurrentMonthSalesFormatted());
         model.addAttribute("currentMonthOrders", statisticsService.getCurrentMonthOrderCount());
         model.addAttribute("bestSellingProduct", statisticsService.getBestSellingProduct());
 
+        // Dữ liệu cho 4 biểu đồ
+        model.addAttribute("statusChart", statisticsService.getOrderStatusData());
+        model.addAttribute("topProductsChart", statisticsService.getTopProductsData());
+        model.addAttribute("categoryChart", statisticsService.getCategoryRevenueData());
+        model.addAttribute("monthlyChart", statisticsService.getMonthlyRevenueData());
+
         return "admin_statistics";
+    }
+
+    // ==============================================================
+    // QUẢN LÝ KHÁCH HÀNG (Khắc phục lỗi 404)
+    // ==============================================================
+    @GetMapping({"/customer", "/users"})
+    public String manageCustomers(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
+        List<com.example.fashionstore.model.User> users;
+        
+        try {
+            if (keyword != null && !keyword.isEmpty()) {
+                // Nếu User Service của bạn chưa có hàm search, hãy comment dòng dưới và dùng getAll()
+                // users = userService.searchUsers(keyword);
+                users = userService.getAllUsers(); // Tạm thời lấy tất cả nếu chưa có hàm tìm kiếm
+                model.addAttribute("keyword", keyword);
+            } else {
+                users = userService.getAllUsers();
+            }
+            model.addAttribute("users", users);
+        } catch (Exception e) {
+            model.addAttribute("users", List.of()); // Tránh lỗi Null
+        }
+        
+        model.addAttribute("page", "customer");
+        return "admin_user_list";
+    }
+
+    // ==============================================================
+    // THAO TÁC TRÊN NGƯỜI DÙNG (Xóa / Cập nhật quyền)
+    // ==============================================================
+    
+    // API Cập nhật quyền (Dùng chung với AJAX JavaScript ở giao diện)
+    @PostMapping("/users/update-role")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<?> updateUserRole(@RequestParam("id") Long id, @RequestParam("role") String role) {
+        com.example.fashionstore.model.User user = userService.findById(id);
+        if (user != null) {
+            user.setRole(role);
+            userService.save(user);
+            return org.springframework.http.ResponseEntity.ok().build();
+        }
+        return org.springframework.http.ResponseEntity.badRequest().build();
+    }
+
+    // Xóa tài khoản
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable("id") Long id, RedirectAttributes ra) {
+        try {
+            userService.delete(id);
+            ra.addFlashAttribute("successMessage", "Xóa tài khoản thành công!");
+        } catch (Exception e) {
+            // Bẫy lỗi y hệt như sản phẩm: Không cho xóa nếu User đã từng đặt hàng
+            ra.addFlashAttribute("errorMessage", "Không thể xóa! Người dùng này đã có lịch sử đặt hàng trong hệ thống.");
+        }
+        return "redirect:/admin/users";
+    }
+
+    // ==============================================================
+    // XEM LỊCH SỬ MUA HÀNG CỦA KHÁCH HÀNG
+    // ==============================================================
+    @GetMapping("/users/history/{id}")
+    public String viewUserHistory(@PathVariable("id") Long id, 
+                                  @RequestParam(value = "keyword", required = false) String keyword,
+                                  @RequestParam(value = "startDate", required = false) String startDate,
+                                  @RequestParam(value = "endDate", required = false) String endDate,
+                                  Model model) {
+        
+        // 1. Tìm thông tin khách hàng
+        com.example.fashionstore.model.User user = userService.findById(id);
+        if (user == null) {
+            return "redirect:/admin/users"; // Nếu không tìm thấy KH thì quay lại trang danh sách
+        }
+        
+        // 2. Đưa dữ liệu sang giao diện admin_user_history.html
+        model.addAttribute("user", user);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("page", "customer"); // Giữ cho menu "Khách hàng" bên trái luôn sáng
+
+        List<OrderDetail> history = orderService.getHistoryByUserId(id);
+        model.addAttribute("history", history);
+        
+        return "admin_user_history"; 
     }
 }
