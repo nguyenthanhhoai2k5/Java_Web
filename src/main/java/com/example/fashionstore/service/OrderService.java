@@ -4,11 +4,13 @@ import com.example.fashionstore.model.*;
 import com.example.fashionstore.repository.OrderDetailRepository;
 import com.example.fashionstore.repository.OrderRepository;
 import com.example.fashionstore.repository.ProductRepository;
+import com.example.fashionstore.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,7 +23,10 @@ public class OrderService {
     private OrderDetailRepository orderDetailRepository;
 
     @Autowired
-    private ProductRepository productRepository; // Bổ sung cái này
+    private ProductRepository productRepository;
+
+    @Autowired
+    private UserRepository userRepository; // Bổ sung UserRepository để tìm User
 
     // Lấy tất cả đơn hàng
     public List<Order> getAllOrders() {
@@ -110,5 +115,28 @@ public class OrderService {
     // Hàm tìm đơn hàng theo ID
     public Order findById(Long id) {
         return orderRepository.findById(id).orElse(null);
+    }
+
+    // ==============================================================
+    // HÀM MỚI BỔ SUNG: LẤY CHI TIẾT LỊCH SỬ SẢN PHẨM CỦA USER
+    // ==============================================================
+    public List<OrderDetail> getHistoryByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+
+        // Lấy danh sách các đơn hàng của User này
+        List<Order> orders = getOrdersByUser(user);
+        
+        // Tạo một list rỗng để gom tất cả các chi tiết sản phẩm lại
+        List<OrderDetail> historyDetails = new ArrayList<>();
+        
+        // Duyệt qua từng đơn hàng, lấy chi tiết ném vào list tổng
+        for (Order order : orders) {
+            historyDetails.addAll(getOrderDetails(order.getId()));
+        }
+        
+        return historyDetails;
     }
 }
