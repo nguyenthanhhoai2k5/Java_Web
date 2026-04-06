@@ -1,92 +1,271 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
 <section>
-    <div class="container mt-4" style="max-width: 90%;"> <h1 class="mb-4 text-primary">Quản Lý Mã Giảm Giá</h1>
+    <div style="background-color: #edf7e9; padding: 20px 30px; min-height: 100vh; width: 100%; box-sizing: border-box;">
+        <div style="max-width: 95%; margin: 0 auto;">
 
-        <div class="d-flex justify-content-between mb-3">
-            <form th:action="@{/admin/coupons}" method="get" class="input-group" style="max-width: 450px;">
-                <input type="text" name="keyword" th:value="${keyword}"
-                       class="form-control" placeholder="Nhập mã hoặc tên chương trình...">
-                <button class="btn btn-outline-primary" type="submit">
-                    <i class="bi bi-search"></i> Tìm kiếm
-                </button>
-                <a th:if="${keyword}" th:href="@{/admin/coupons}" class="btn btn-outline-danger">
-                    <i class="bi bi-x-lg"></i>
+            <!-- Tiêu đề chính -->
+            <h1 style="font-weight: 700; color: #1f4f2b; border-left: 6px solid #4caf50; padding-left: 18px; margin-bottom: 1.8rem; font-size: 1.85rem;">
+                <i class="fas fa-tags me-2" style="color: #4caf50;"></i> Quản Lý Mã Giảm Giá
+            </h1>
+
+            <!-- Thanh tìm kiếm và nút thêm -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                <form th:action="@{/admin/coupons}" method="get" style="border-radius: 50px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; max-width: 450px; flex: 1;">
+                    <input type="text" name="keyword" th:value="${keyword}" style="flex: 1; padding: 10px 16px; border: 1px solid #cfe3ca; border-top-left-radius: 50px; border-bottom-left-radius: 50px; border-right: none; font-size: 0.95rem;" placeholder="🔍 Nhập mã hoặc tên chương trình...">
+                    <button type="submit" style="padding: 8px 24px; border-radius: 0 50px 50px 0; font-weight: 500; transition: all 0.2s; color: #2d6a2f; background-color: transparent; border: 1px solid #bddcb5; cursor: pointer;">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                    <a th:if="${keyword}" th:href="@{/admin/coupons}" style="padding: 8px 20px; border-radius: 40px; font-weight: 500; transition: all 0.2s; color: #fff; background-color: #dc3545; border: 1px solid #dc3545; text-decoration: none; display: inline-block; margin-left: 0.5rem;">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </form>
+
+                <a th:href="@{/admin/coupons/add}" style="border-radius: 40px; padding: 10px 28px; font-weight: 600; transition: all 0.2s; color: white; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); border: none; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);">
+                    <i class="fas fa-plus-circle"></i> Thêm mã giảm giá
                 </a>
-            </form>
+            </div>
 
-            <a th:href="@{/admin/coupons/add}" class="btn btn-success">
-                <i class="bi bi-plus-circle"></i> Thêm mã giảm giá
-            </a>
-        </div>
-
-        <div class="card shadow">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle mb-0">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>STT</th>
-                        <th>Mã</th>
-                        <th>Tên chương trình</th>
-                        <th>Loại SP áp dụng</th>
-                        <th>Giá trị</th>
-                        <th>Bắt đầu</th>
-                        <th>Kết thúc</th>
-                        <th>Trạng thái</th>
-                        <th>Thao tác</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+            <!-- Card bảng mã giảm giá -->
+            <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15);">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; margin-bottom: 0; color: #212529; border-collapse: collapse;">
+                        <thead style="background: linear-gradient(135deg, #1f4f2b 0%, #2e7d32 100%); color: white;">
+                        <tr>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">STT</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Mã</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Tên chương trình</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Loại SP áp dụng</th>
+                            <th style="padding: 1rem; text-align: center; font-weight: 600; border-bottom: 2px solid #4caf50;">Giá trị</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Bắt đầu</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #4caf50;">Kết thúc</th>
+                            <th style="padding: 1rem; text-align: center; font-weight: 600; border-bottom: 2px solid #4caf50;">Trạng thái</th>
+                            <th style="padding: 1rem; text-align: center; font-weight: 600; border-bottom: 2px solid #4caf50;">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
                         <tr th:if="${#lists.isEmpty(coupons)}">
-                            <td colspan="9" class="text-center py-4 fw-bold text-muted">Không có mã giảm giá nào được tìm thấy</td>
+                            <td colspan="9" style="text-align: center; padding: 3rem; font-weight: bold; color: #6c757d; font-size: 1.1rem;">
+                                <i class="fas fa-ticket-alt" style="font-size: 2rem; display: block; margin-bottom: 1rem; color: #cfe3ca;"></i>
+                                Không có mã giảm giá nào được tìm thấy
+                            </td>
                         </tr>
 
-                        <tr th:each="cp, state : ${coupons}">
-                            <td th:text="${state.count}">1</td>
-                            <td>
-                                <span class="badge bg-light text-dark border" th:text="${cp.code}">KM2024</span>
+                        <tr th:each="cp, state : ${coupons}" style="border-bottom: 1px solid #eaf5e6; transition: all 0.2s;">
+                            <td style="padding: 1rem; vertical-align: middle; color: #2c3e2d;" th:text="${state.count}">1</td>
+                            <td style="padding: 1rem; vertical-align: middle;">
+                                <span style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; border-radius: 20px; font-weight: 700; font-size: 0.875rem; letter-spacing: 1px;" th:text="${cp.code}">KM2024</span>
                             </td>
-                            <td th:text="${cp.description}">Tên chương trình</td>
-
-                            <td>
-                <span th:each="cat, iterStat : ${cp.appliedCategories}">
-                    <span th:text="${cat.name}"></span>
-                    <th:block th:if="${!iterStat.last}">, </th:block>
-                </span>
-                                <span th:if="${#lists.isEmpty(cp.appliedCategories)}" class="text-muted small">Tất cả</span>
+                            <td style="padding: 1rem; vertical-align: middle;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-gift" style="color: #4caf50;"></i>
+                                    <span style="font-weight: 600; color: #2c3e2d;" th:text="${cp.description}">Tên chương trình</span>
+                                </div>
                             </td>
-
-                            <td>
-                                <span th:text="${cp.discountValue}"></span>
-                                <span th:text="${cp.discountType == 'percent' ? '%' : 'VNĐ'}"></span>
+                            <td style="padding: 1rem; vertical-align: middle;">
+                                    <span th:each="cat, iterStat : ${cp.appliedCategories}" style="display: inline-block; padding: 4px 10px; background-color: #eaf5e6; color: #2e7d32; border-radius: 16px; font-size: 0.75rem; margin: 2px;">
+                                        <i class="fas fa-folder-open"></i> <span th:text="${cat.name}"></span>
+                                    </span>
+                                <span th:if="${#lists.isEmpty(cp.appliedCategories)}" style="display: inline-block; padding: 4px 12px; background-color: #e9ecef; color: #6c757d; border-radius: 16px; font-size: 0.75rem;">
+                                        <i class="fas fa-globe"></i> Tất cả
+                                    </span>
                             </td>
-
-                            <td th:text="${cp.startDate}">01/01/2026</td>
-                            <td th:text="${cp.endDate}">31/12/2026</td>
-
-                            <td>
-                                <span th:if="${cp.status == 'Còn hiệu lực'}" class="badge bg-success">Còn hiệu lực</span>
-                                <span th:if="${cp.status == 'Hết hạn'}" class="badge bg-danger">Hết hạn</span>
-                                <span th:if="${cp.status == 'Tạm dừng'}" class="badge bg-warning text-dark">Tạm dừng</span>
+                            <td style="padding: 1rem; text-align: center; vertical-align: middle;">
+                                    <span th:if="${cp.discountType == 'percent'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; border-radius: 20px; font-weight: 700; font-size: 0.875rem;">
+                                        <i class="fas fa-percent"></i> <span th:text="${cp.discountValue}"></span>%
+                                    </span>
+                                <span th:if="${cp.discountType != 'percent'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); color: white; border-radius: 20px; font-weight: 700; font-size: 0.875rem;">
+                                        <i class="fas fa-money-bill"></i> <span th:text="${#numbers.formatDecimal(cp.discountValue, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                    </span>
                             </td>
-
-                            <td>
-                                <div class="d-flex gap-1">
-                                    <a th:href="@{'/admin/coupons/edit/' + ${cp.id}}" class="btn btn-sm btn-info text-white">
-                                        <i class="bi bi-pencil-square"></i> Sửa
+                            <td style="padding: 1rem; vertical-align: middle;">
+                                <i class="fas fa-calendar-alt" style="color: #4caf50; margin-right: 6px;"></i>
+                                <span th:text="${#temporals.format(cp.startDate, 'dd/MM/yyyy')}" style="color: #2c3e2d;">01/01/2026</span>
+                            </td>
+                            <td style="padding: 1rem; vertical-align: middle;">
+                                <i class="fas fa-calendar-check" style="color: #dc3545; margin-right: 6px;"></i>
+                                <span th:text="${#temporals.format(cp.endDate, 'dd/MM/yyyy')}" style="color: #2c3e2d;">31/12/2026</span>
+                            </td>
+                            <td style="padding: 1rem; text-align: center; vertical-align: middle;">
+                                    <span th:if="${cp.status == 'Còn hiệu lực'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border-radius: 20px; font-weight: 600; font-size: 0.75rem;">
+                                        <i class="fas fa-check-circle"></i> Còn hiệu lực
+                                    </span>
+                                <span th:if="${cp.status == 'Hết hạn'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border-radius: 20px; font-weight: 600; font-size: 0.75rem;">
+                                        <i class="fas fa-hourglass-end"></i> Hết hạn
+                                    </span>
+                                <span th:if="${cp.status == 'Tạm dừng'}" style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #2c3e2d; border-radius: 20px; font-weight: 600; font-size: 0.75rem;">
+                                        <i class="fas fa-pause-circle"></i> Tạm dừng
+                                    </span>
+                            </td>
+                            <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                                <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                                    <a th:href="@{'/admin/coupons/edit/' + ${cp.id}}" style="border-radius: 30px; padding: 6px 16px; font-weight: 500; transition: all 0.2s; color: white; background-color: #17a2b8; border: 1px solid #17a2b8; text-decoration: none; display: inline-block;">
+                                        <i class="fas fa-edit"></i> Sửa
                                     </a>
-                                    <a th:href="@{'/admin/coupons/delete/' + ${cp.id}}"
-                                       class="btn btn-sm btn-danger"
-                                       onclick="return confirm('Bạn có chắc chắn muốn xóa mã này?')">
-                                        <i class="bi bi-trash"></i> Xóa
+                                    <a th:href="@{'/admin/coupons/delete/' + ${cp.id}}" onclick="return confirm('⚠️ Bạn có chắc chắn muốn xóa mã này?')" style="border-radius: 30px; padding: 6px 16px; font-weight: 500; transition: all 0.2s; color: #dc3545; background-color: transparent; border: 1px solid #dc3545; text-decoration: none; display: inline-block;">
+                                        <i class="fas fa-trash"></i> Xóa
                                     </a>
                                 </div>
                             </td>
                         </tr>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        /* Hover effects */
+        button[type="submit"]:hover {
+            background-color: #4caf50 !important;
+            color: white !important;
+            border-color: #4caf50 !important;
+        }
+
+        a[style*="border-radius: 40px"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.35) !important;
+        }
+
+        /* Hover cho dòng trong bảng */
+        tbody tr:hover {
+            background-color: #f3fcef !important;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Hover cho nút sửa */
+        a[style*="background-color: #17a2b8"]:hover {
+            background-color: #138496 !important;
+            border-color: #138496 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+        }
+
+        /* Hover cho nút xóa */
+        a[style*="color: #dc3545"]:hover {
+            background-color: #dc3545 !important;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Focus cho input */
+        input:focus {
+            outline: none;
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+        }
+
+        /* Hiệu ứng hover cho card */
+        div[style*="border-radius: 24px"]:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(76, 175, 80, 0.12) !important;
+        }
+
+        /* Animation fadeIn */
+        table {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            div[style*="background-color: #edf7e9"] {
+                padding: 15px !important;
+            }
+
+            div[style*="max-width: 95%"] {
+                max-width: 100% !important;
+            }
+
+            div[style*="display: flex; justify-content: space-between"] {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+
+            form[style*="max-width: 450px"] {
+                max-width: 100% !important;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.75rem !important;
+            }
+
+            div[style*="display: flex; gap: 0.5rem"] {
+                flex-direction: column !important;
+                align-items: center !important;
+            }
+
+            a[style*="border-radius: 30px"] {
+                padding: 4px 12px !important;
+                font-size: 0.75rem !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.5rem !important;
+            }
+
+            h1 {
+                font-size: 1.5rem !important;
+            }
+
+            span[style*="font-size: 0.875rem"] {
+                font-size: 0.7rem !important;
+            }
+
+            span[style*="padding: 6px 14px"] {
+                padding: 4px 8px !important;
+                font-size: 0.65rem !important;
+            }
+        }
+
+        /* Scrollbar đẹp */
+        div[style*="overflow-x: auto"]::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+            background: #4caf50;
+            border-radius: 10px;
+        }
+
+        div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover {
+            background: #2e7d32;
+        }
+
+        /* Style cho badge category */
+        span[style*="background-color: #eaf5e6"]:hover {
+            background-color: #4caf50 !important;
+            color: white !important;
+            transition: all 0.2s;
+        }
+    </style>
 </section>
 </html>

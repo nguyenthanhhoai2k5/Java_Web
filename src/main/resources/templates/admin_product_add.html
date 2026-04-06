@@ -1,95 +1,193 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
 <section>
-    <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <!-- Alert message -->
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; animation: slideInRight 0.3s ease-out;">
         <span th:text="${message}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right; background: transparent; border: none; font-size: 1.5rem; cursor: pointer;"></button>
     </div>
 
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; animation: slideInRight 0.3s ease-out;">
         <span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right; background: transparent; border: none; font-size: 1.5rem; cursor: pointer;"></button>
     </div>
 
-    <div class="container mt-4" style="max-width: 80%;">
-        <div class="mb-3">
-            <a th:href="@{/admin/category}" class="btn btn-outline-secondary btn-sm">
-                Quay về danh sách sản phẩm
-            </a>
-        </div>
-
-        <div class="card shadow">
-            <div class="card-header bg-white">
-                <h1 class="h3 mb-0 text-primary"
-                    th:text="${product.id != null ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'}"></h1>
+    <div style="background-color: #edf7e9; padding: 20px 30px; min-height: 100vh; width: 100%; box-sizing: border-box;">
+        <div style="max-width: 90%; margin: 0 auto;">
+            <!-- Nút quay lại -->
+            <div style="margin-bottom: 1rem;">
+                <a th:href="@{/admin/category}" style="border-radius: 40px; padding: 6px 20px; font-weight: 500; transition: all 0.2s; color: #2d6a2f; background-color: transparent; border: 1px solid #bddcb5; text-decoration: none; display: inline-block; font-size: 0.875rem;">
+                    <i class="fas fa-arrow-left"></i> Quay về danh sách sản phẩm
+                </a>
             </div>
 
-            <div class="card-body">
-                <form th:action="@{/admin/product/save}"
-                      th:object="${product}"
-                      method="post"
-                      enctype="multipart/form-data">
-                    <input type="hidden" th:field="*{id}">
-                    <input type="hidden" th:field="*{image}">
+            <!-- Card chính -->
+            <div style="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%); border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(76, 175, 80, 0.15);">
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Tên sản phẩm</label>
-                            <input type="text" th:field="*{name}" class="form-control" required>
-                        </div>
+                <!-- Card Header -->
+                <div style="background: white; padding: 1.5rem 2rem; border-bottom: 2px solid #eaf5e6;">
+                    <h1 class="h3 mb-0" style="font-weight: 700; color: #1f4f2b; font-size: 1.75rem; margin: 0;">
+                        <i class="fas fa-box-open me-2" style="color: #4caf50;"></i>
+                        <span th:text="${product.id != null ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'}"></span>
+                    </h1>
+                </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Loại sản phẩm</label>
-                            <select th:field="*{category.id}" class="form-select" required>
-                                <option value="">Chọn loại sản phẩm</option>
-                                <option th:each="category : ${categories}"
-                                        th:value="${category.id}"
-                                        th:text="${category.name}">
-                                </option>
-                            </select>
-                        </div>
+                <!-- Card Body -->
+                <div style="padding: 2rem;">
+                    <form th:action="@{/admin/product/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{image}">
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Giá sản phẩm</label>
-                            <input type="number" th:field="*{price}" class="form-control" min="0" step="0.01" required>
-                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                            <!-- Cột trái -->
+                            <div style="flex: 1; min-width: 250px;">
+                                <!-- Tên sản phẩm -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-tag me-1" style="color: #4caf50;"></i> Tên sản phẩm
+                                    </label>
+                                    <input type="text" th:field="*{name}" required style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;">
+                                </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Số lượng</label>
-                            <input type="number" th:field="*{quantity}" class="form-control" min="0" required>
-                        </div>
+                                <!-- Loại sản phẩm -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-folder me-1" style="color: #4caf50;"></i> Loại sản phẩm
+                                    </label>
+                                    <select th:field="*{category.id}" required style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s; cursor: pointer;">
+                                        <option value="">Chọn loại sản phẩm</option>
+                                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                                    </select>
+                                </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Trạng thái</label>
-                            <select th:field="*{status}" class="form-select" required>
-                                <option value="Mới">Mới</option>
-                                <option value="Cũ">Cũ</option>
-                            </select>
-                        </div>
+                                <!-- Giá sản phẩm -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-dollar-sign me-1" style="color: #4caf50;"></i> Giá sản phẩm
+                                    </label>
+                                    <input type="number" th:field="*{price}" min="0" step="0.01" required style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;">
+                                </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Hình ảnh</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image/*">
-                            <div class="mt-2" th:if="${product.image != null and !#strings.isEmpty(product.image)}">
-                                <img th:src="@{'/images/' + ${product.image}}"
-                                     alt="Ảnh sản phẩm"
-                                     class="img-thumbnail"
-                                     style="max-height: 180px;">
+                                <!-- Số lượng -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-boxes me-1" style="color: #4caf50;"></i> Số lượng
+                                    </label>
+                                    <input type="number" th:field="*{quantity}" min="0" required style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;">
+                                </div>
+                            </div>
+
+                            <!-- Cột phải -->
+                            <div style="flex: 1; min-width: 250px;">
+                                <!-- Trạng thái -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-circle-info me-1" style="color: #4caf50;"></i> Trạng thái
+                                    </label>
+                                    <select th:field="*{status}" required style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s; cursor: pointer;">
+                                        <option value="Mới">✨ Mới</option>
+                                        <option value="Cũ">📌 Cũ</option>
+                                    </select>
+                                </div>
+
+                                <!-- Hình ảnh -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-image me-1" style="color: #4caf50;"></i> Hình ảnh
+                                    </label>
+                                    <input type="file" name="imageFile" accept="image/*" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s;">
+                                    <div th:if="${product.image != null and !#strings.isEmpty(product.image)}" style="margin-top: 0.75rem;">
+                                        <img th:src="@{'/images/' + ${product.image}}" alt="Ảnh sản phẩm" style="border-radius: 14px; border: 1px solid #dee2cf; padding: 4px; max-height: 180px; max-width: 100%; object-fit: cover;">
+                                    </div>
+                                </div>
+
+                                <!-- Mô tả -->
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="font-weight: 600; color: #2c5e2e; margin-bottom: 8px; display: inline-block;">
+                                        <i class="fas fa-align-left me-1" style="color: #4caf50;"></i> Mô tả
+                                    </label>
+                                    <textarea th:field="*{description}" rows="4" style="display: block; width: 100%; padding: 10px 16px; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #cfe3ca; border-radius: 16px; transition: 0.2s; resize: vertical;"></textarea>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Mô tả</label>
-                            <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+                        <!-- Nút submit -->
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button type="submit" style="border-radius: 40px; padding: 12px 40px; font-weight: 600; transition: all 0.2s; color: #fff; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); border: none; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);">
+                                <i class="fas fa-save me-2"></i> Lưu sản phẩm
+                            </button>
                         </div>
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-success px-5">Lưu sản phẩm</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        /* Animation cho alert */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Hover effects */
+        .btn-outline-secondary:hover {
+            background-color: #4caf50 !important;
+            color: white !important;
+            border-color: #4caf50 !important;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.35) !important;
+        }
+
+        /* Focus effects cho input */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            div[style*="background-color: #edf7e9"] {
+                padding: 15px !important;
+            }
+
+            div[style*="max-width: 90%"] {
+                max-width: 100% !important;
+            }
+
+            div[style*="display: flex; flex-wrap: wrap; gap: 1.5rem"] {
+                flex-direction: column !important;
+                gap: 0 !important;
+            }
+
+            button[type="submit"] {
+                width: 100% !important;
+                padding: 12px 20px !important;
+            }
+
+            .alert {
+                position: relative !important;
+                top: 0 !important;
+                right: 0 !important;
+                margin-bottom: 1rem !important;
+            }
+        }
+
+        /* Hiệu ứng hover cho card */
+        div[style*="background: linear-gradient(135deg, #ffffff 0%, #fefef9 100%)"]:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(76, 175, 80, 0.12) !important;
+        }
+    </style>
 </section>
 </html>

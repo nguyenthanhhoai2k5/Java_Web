@@ -35,6 +35,7 @@
 <body>
 
 <div class="sidebar">
+<<<<<<< HEAD
     <h4 class="text-center mb-4">Fashion Admin</h4>
     <hr>
     <a th:href="@{/admin/home}" th:classappend="${page == 'home'} ? 'active' : ''">🏠 Trang chủ</a>
@@ -45,6 +46,49 @@
     <a th:href="@{/admin/statistics}" th:classappend="${page == 'statistics'} ? 'active' : ''">📊 Thống kê</a>
     <hr>
     <a href="/logout" class="text-danger">Đăng xuất</a>
+=======
+    <div class="sidebar-brand">
+        <h4>👗 Fashion Admin</h4>
+    </div>
+
+    <div class="sidebar-menu">
+        <a th:href="@{/admin/home}" th:classappend="${page == 'home'} ? 'active' : ''">
+            <span>🏠</span>
+            <span class="menu-text">Trang chủ</span>
+        </a>
+        <a th:href="@{/admin/category}" th:classappend="${page == 'category'} ? 'active' : ''">
+            <span>📂</span>
+            <span class="menu-text">Quản lý danh mục</span>
+        </a>
+        <a th:href="@{/admin/coupons}" th:classappend="${page == 'coupons'} ? 'active' : ''">
+            <span>🎟️</span>
+            <span class="menu-text">Quản lý mã giảm giá</span>
+        </a>
+        <a th:href="@{/admin/customer}" th:classappend="${page == 'customer'} ? 'active' : ''">
+            <span>👥</span>
+            <span class="menu-text">Quản lý người mua</span>
+        </a>
+        <a th:href="@{/admin/order}" th:classappend="${page == 'order'} ? 'active' : ''">
+            <span>📦</span>
+            <span class="menu-text">Quản lý đơn hàng</span>
+        </a>
+        <a th:href="@{/admin/statistics}" th:classappend="${page == 'statistics'} ? 'active' : ''">
+            <span>📊</span>
+            <span class="menu-text">Thống kê</span>
+        </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-menu">
+        <form th:action="@{/logout}" method="post" id="logoutForm" style="display: none;"></form>
+
+        <a href="javascript:void(0)" onclick="document.getElementById('logoutForm').submit();">
+            <span>🚪</span>
+            <span class="menu-text">Đăng xuất</span>
+        </a>
+    </div>
+>>>>>>> 8c916f6 (Thông điệp mô tả thay đổi)
 </div>
 
 <div class="content">

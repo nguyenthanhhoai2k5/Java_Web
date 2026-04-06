@@ -2,157 +2,39 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin_layout :: layout}">
 <section>
     <div class="container mt-4" style="max-width: 95%;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-primary m-0"><i class="bi bi-graph-up-arrow me-2"></i>Báo Cáo Thống Kê</h1>
-            <button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer me-2"></i>In Báo Cáo</button>
-        </div>
+        <h1 class="mb-4 text-primary"><i class="bi bi-graph-up-arrow me-2"></i>Báo Cáo Thống Kê</h1>
 
         <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="card p-4 border-0 shadow-sm text-white h-100" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
+                <div class="card p-4 border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
                     <h6 class="text-uppercase mb-2 opacity-75">Doanh thu tháng này</h6>
                     <h2 class="fw-bold mb-0" th:text="${currentMonthSales != null ? currentMonthSales : '0đ'}">0đ</h2>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card p-4 border-0 shadow-sm text-white h-100" style="background: linear-gradient(135deg, #2F80ED, #56CCF2);">
+                <div class="card p-4 border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #2F80ED, #56CCF2);">
                     <h6 class="text-uppercase mb-2 opacity-75">Đơn hàng tháng này</h6>
                     <h2 class="fw-bold mb-0" th:text="${currentMonthOrders != null ? currentMonthOrders : 0}">0</h2>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card p-4 border-0 shadow-sm text-white h-100" style="background: linear-gradient(135deg, #FF416C, #FF4B2B);">
+                <div class="card p-4 border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #FF416C, #FF4B2B);">
                     <h6 class="text-uppercase mb-2 opacity-75">Sản phẩm bán chạy nhất</h6>
                     <h5 class="fw-bold mb-0" th:text="${bestSellingProduct != null ? bestSellingProduct : 'Chưa có dữ liệu'}">Tên SP</h5>
                 </div>
             </div>
         </div>
 
-        <div class="row g-4 mb-5">
-            <div class="col-lg-8">
-                <div class="card shadow border-0 p-4 h-100">
-                    <h5 class="fw-bold text-secondary mb-4">Doanh thu theo tháng (VNĐ)</h5>
-                    <div style="height: 300px;">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card shadow border-0 p-4 h-100">
-                    <h5 class="fw-bold text-secondary mb-4">Tỷ lệ Trạng thái đơn hàng</h5>
-                    <div style="height: 300px; display: flex; justify-content: center;">
-                        <canvas id="orderStatusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="card shadow border-0 p-4 h-100">
-                    <h5 class="fw-bold text-secondary mb-4">Top 5 Sản phẩm bán chạy (Số lượng)</h5>
-                    <div style="height: 300px;">
-                        <canvas id="topProductsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="card shadow border-0 p-4 h-100">
-                    <h5 class="fw-bold text-secondary mb-4">Doanh thu theo Danh mục</h5>
-                    <div style="height: 300px; display: flex; justify-content: center;">
-                        <canvas id="categoryChart"></canvas>
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card shadow border-0 p-4">
+                    <h5 class="fw-bold text-secondary mb-4">Biểu đồ tổng quan (Cần tích hợp Chart.js)</h5>
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 300px; border: 2px dashed #ccc;">
+                        <span class="text-muted"><i class="bi bi-bar-chart-line fs-1 d-block text-center"></i> Khu vực hiển thị biểu đồ</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script th:inline="javascript">
-        // 1. Lấy dữ liệu thật từ Model của Spring Boot truyền sang
-        const statusData = /*[[${statusChart}]]*/ {labels: [], values: []};
-        const topProductsData = /*[[${topProductsChart}]]*/ {labels: [], values: []};
-        const categoryData = /*[[${categoryChart}]]*/ {labels: [], values: []};
-        const monthlyData = /*[[${monthlyChart}]]*/ {labels: [], values: []};
-
-        // 2. Bảo vệ dữ liệu (phòng trường hợp list bị rỗng / null từ DB)
-        const safeStatusLabels = statusData?.labels || [];
-        const safeStatusValues = statusData?.values || [];
-
-        const safeTopLabels = topProductsData?.labels || [];
-        const safeTopValues = topProductsData?.values || [];
-
-        const safeCategoryLabels = categoryData?.labels || [];
-        const safeCategoryValues = categoryData?.values || [];
-
-        const safeMonthlyLabels = monthlyData?.labels || [];
-        const safeMonthlyValues = monthlyData?.values || [];
-
-        // 3. Khai báo bảng màu chuẩn cho các biểu đồ
-        const colors = { primary: '#72B01D', navy: '#22577A', danger: '#ff4757', warning: '#ffa502', info: '#2ed573' };
-        const pieColors = ['#ff9ff3', '#54a0ff', '#feca57', '#1dd1a1', '#ff6b6b', '#c8d6e5'];
-
-        // 4. Bắt đầu vẽ Biểu đồ Doanh thu (Line Chart)
-        new Chart(document.getElementById('revenueChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: safeMonthlyLabels,
-                datasets: [{
-                    label: 'Doanh thu (VNĐ)',
-                    data: safeMonthlyValues,
-                    borderColor: colors.primary,
-                    backgroundColor: 'rgba(114, 176, 29, 0.2)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-
-        // 5. Vẽ Biểu đồ Trạng thái đơn hàng (Doughnut Chart)
-        new Chart(document.getElementById('orderStatusChart').getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: safeStatusLabels,
-                datasets: [{
-                    data: safeStatusValues,
-                    backgroundColor: [colors.info, colors.warning, colors.danger, '#a29bfe', '#dfe6e9'],
-                    borderWidth: 0
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
-        });
-
-        // 6. Vẽ Biểu đồ Top 5 Sản phẩm (Bar Chart)
-        new Chart(document.getElementById('topProductsChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: safeTopLabels,
-                datasets: [{
-                    label: 'Số lượng đã bán',
-                    data: safeTopValues,
-                    backgroundColor: colors.navy,
-                    borderRadius: 5
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-        });
-
-        // 7. Vẽ Biểu đồ Doanh thu theo Danh mục (Pie Chart)
-        new Chart(document.getElementById('categoryChart').getContext('2d'), {
-            type: 'pie',
-            data: {
-                labels: safeCategoryLabels,
-                datasets: [{
-                    data: safeCategoryValues,
-                    backgroundColor: pieColors,
-                    borderWidth: 1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    </script>
 </section>
 </html>
