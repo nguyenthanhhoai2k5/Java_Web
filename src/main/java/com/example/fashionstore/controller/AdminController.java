@@ -52,6 +52,14 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+    
+    // ==============================================================
+    // TRANG ĐĂNG NHẬP ADMIN
+    // ==============================================================
+    @GetMapping("/login")
+    public String showAdminLoginPage() {
+        return "admin_login";
+    }
     // ==============================================================
     // TRANG CHỦ ADMIN (DASHBOARD)
     // ==============================================================
