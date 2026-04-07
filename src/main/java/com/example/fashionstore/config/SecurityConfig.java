@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -20,19 +19,13 @@ public class SecurityConfig {
     }
 
     // ==============================================================
-    // 1. CẤU HÌNH BẢO MẬT CHO ADMIN (Két sắt số 1)
+    // 1. CẤU HÌNH BẢO MẬT CHO ADMIN
     // ==============================================================
     @Bean
     @Order(1) 
     public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
-        // TẠO KHO LƯU TRỮ PHIÊN ĐĂNG NHẬP ĐỘC LẬP CHO ADMIN
-        HttpSessionSecurityContextRepository adminContextRepo = new HttpSessionSecurityContextRepository();
-        adminContextRepo.setSpringSecurityContextKey("ADMIN_SECURITY_CONTEXT");
-
         http
             .securityMatcher("/admin/**") 
-            // Gắn két sắt số 1 vào chuỗi bảo mật của Admin
-            .securityContext(context -> context.securityContextRepository(adminContextRepo))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/login").permitAll()
@@ -55,21 +48,16 @@ public class SecurityConfig {
     }
 
     // ==============================================================
-    // 2. CẤU HÌNH BẢO MẬT CHO KHÁCH HÀNG (Két sắt số 2)
+    // 2. CẤU HÌNH BẢO MẬT CHO KHÁCH HÀNG
     // ==============================================================
     @Bean
     @Order(2) 
     public SecurityFilterChain userFilterChain(HttpSecurity http) throws Exception {
-        // TẠO KHO LƯU TRỮ PHIÊN ĐĂNG NHẬP ĐỘC LẬP CHO USER
-        HttpSessionSecurityContextRepository userContextRepo = new HttpSessionSecurityContextRepository();
-        userContextRepo.setSpringSecurityContextKey("USER_SECURITY_CONTEXT");
-
         http
-            // Gắn két sắt số 2 vào chuỗi bảo mật của Khách hàng
-            .securityContext(context -> context.securityContextRepository(userContextRepo))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/profile/**", "/checkout/**").hasAuthority("ROLE_USER") // Chỉ USER mới được vào
+                // Cấp quyền: Khách hàng (USER) hoặc Admin đều có thể xem trang cá nhân
+                .requestMatchers("/profile/**", "/checkout/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN") 
                 .anyRequest().permitAll() 
             )
             .formLogin(form -> form
