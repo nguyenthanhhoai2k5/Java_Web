@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -19,30 +20,34 @@ public class SecurityConfig {
     }
 
     // ==============================================================
-    // 1. CẤU HÌNH BẢO MẬT CHO ADMIN (Ưu tiên số 1)
+    // 1. CẤU HÌNH BẢO MẬT CHO ADMIN (Két sắt số 1)
     // ==============================================================
     @Bean
-    @Order(1) // Đặt ưu tiên 1 để Spring kiểm tra các link /admin trước
+    @Order(1) 
     public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
+        // TẠO KHO LƯU TRỮ PHIÊN ĐĂNG NHẬP ĐỘC LẬP CHO ADMIN
+        HttpSessionSecurityContextRepository adminContextRepo = new HttpSessionSecurityContextRepository();
+        adminContextRepo.setSpringSecurityContextKey("ADMIN_SECURITY_CONTEXT");
+
         http
-            .securityMatcher("/admin/**") // Chuỗi này CHỈ bắt các link bắt đầu bằng /admin
+            .securityMatcher("/admin/**") 
+            // Gắn két sắt số 1 vào chuỗi bảo mật của Admin
+            .securityContext(context -> context.securityContextRepository(adminContextRepo))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Cho phép tất cả mọi người vào xem trang đăng nhập của Admin
                 .requestMatchers("/admin/login").permitAll()
-                // Tất cả các trang /admin/ còn lại BẮT BUỘC phải có quyền ROLE_ADMIN
                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
             )
             .formLogin(form -> form
-                .loginPage("/admin/login")              // Link trỏ đến giao diện HTML admin_login
-                .loginProcessingUrl("/admin/login")     // Nơi form HTML gửi dữ liệu kiểm tra
-                .defaultSuccessUrl("/admin/home", true) // Đăng nhập đúng -> Vào Dashboard
-                .failureUrl("/admin/login?error=true")  // Đăng nhập sai -> Tải lại kèm báo lỗi
+                .loginPage("/admin/login")              
+                .loginProcessingUrl("/admin/login")     
+                .defaultSuccessUrl("/admin/home", true) 
+                .failureUrl("/admin/login?error=true")  
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/admin/logout")             // Link để đăng xuất tài khoản Admin
-                .logoutSuccessUrl("/admin/login?logout=true") // Đăng xuất xong về lại trang login Admin
+                .logoutUrl("/admin/logout")             
+                .logoutSuccessUrl("/admin/login?logout=true") 
                 .permitAll()
             );
 
@@ -50,16 +55,22 @@ public class SecurityConfig {
     }
 
     // ==============================================================
-    // 2. CẤU HÌNH BẢO MẬT CHO KHÁCH HÀNG (Ưu tiên số 2)
+    // 2. CẤU HÌNH BẢO MẬT CHO KHÁCH HÀNG (Két sắt số 2)
     // ==============================================================
     @Bean
-    @Order(2) // Các link còn lại sẽ rơi vào chuỗi này
+    @Order(2) 
     public SecurityFilterChain userFilterChain(HttpSecurity http) throws Exception {
+        // TẠO KHO LƯU TRỮ PHIÊN ĐĂNG NHẬP ĐỘC LẬP CHO USER
+        HttpSessionSecurityContextRepository userContextRepo = new HttpSessionSecurityContextRepository();
+        userContextRepo.setSpringSecurityContextKey("USER_SECURITY_CONTEXT");
+
         http
+            // Gắn két sắt số 2 vào chuỗi bảo mật của Khách hàng
+            .securityContext(context -> context.securityContextRepository(userContextRepo))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/profile/**").authenticated() // Vào xem hồ sơ cá nhân phải đăng nhập
-                .anyRequest().permitAll() // Còn lại (Trang chủ, xem sản phẩm...) cho phép xem thoải mái
+                .requestMatchers("/profile/**", "/checkout/**").hasAuthority("ROLE_USER") // Chỉ USER mới được vào
+                .anyRequest().permitAll() 
             )
             .formLogin(form -> form
                 .loginPage("/login")
