@@ -37,7 +37,7 @@ public class ProductService {
     // Kỹ thuật phân trang
     public Page<Product> getAllPaged(int pageNum, String keyword) {
         // 10 sản phẩm mỗi trang theo yêu cầu của bạn
-        Pageable pageable = PageRequest.of(pageNum - 1, 10);
+        Pageable pageable = PageRequest.of(pageNum - 1, 50);
 
         if (keyword != null && !keyword.isEmpty()) {
             return repository.findByNameContainingIgnoreCase(keyword, pageable);
